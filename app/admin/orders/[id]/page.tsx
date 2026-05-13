@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { SendInvoiceButton } from "@/components/send-invoice-button"
 import { StoreOrderEmailBody } from "@/components/store-order-email-body"
 import { fetchOrderWithItems } from "@/lib/orders"
 import { issueInvoiceAction, markOrderOpened, sendInvoiceAction } from "../actions"
@@ -51,7 +52,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
 
       {isInvoice ? (
         <div className="mx-auto max-w-[600px] border-t border-amber-200 bg-amber-50/80 px-5 py-6">
-          <h2 className="mb-3 text-sm font-semibold text-amber-900">管理（請求書払い）</h2>
+          <h2 className="mb-3 text-sm font-semibold text-amber-900">請求書発行</h2>
           <ul className="mb-4 space-y-1 text-sm text-amber-950">
             <li>
               発行: {order.invoice_issued_at ? <strong>{formatTs(order.invoice_issued_at)}</strong> : "未発行"}
@@ -65,35 +66,18 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
               <input type="hidden" name="orderId" value={order.id} />
               <button
                 type="submit"
-                disabled={issued}
-                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-amber-700 disabled:cursor-not-allowed disabled:bg-stone-300"
+                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-amber-700"
               >
-                請求書発行
+                PDF発行
               </button>
             </form>
-            <a
-              href={`/admin/orders/${order.id}/invoice-print`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center rounded-lg border border-stone-400 bg-white px-4 py-2 text-sm font-semibold text-stone-800 shadow-sm hover:bg-stone-50"
-            >
-              印刷・PDF
-            </a>
-            <form action={sendInvoiceAction}>
-              <input type="hidden" name="orderId" value={order.id} />
-              <button
-                type="submit"
-                disabled={!issued || sent}
-                className="rounded-lg border border-amber-700 bg-white px-4 py-2 text-sm font-semibold text-amber-900 hover:bg-amber-100 disabled:cursor-not-allowed disabled:border-stone-200 disabled:text-stone-400"
-              >
-                送付
-              </button>
-            </form>
+            <SendInvoiceButton
+              orderId={order.id}
+              issued={issued}
+              sent={sent}
+              action={sendInvoiceAction}
+            />
           </div>
-          <p className="mt-3 text-xs text-amber-900/80">
-            「印刷・PDF」はブラウザのレイアウトで開きます。印刷ダイアログで PDF に保存してください。送付は発行後に実行。メールには{" "}
-            <code className="rounded bg-white/80 px-1">RESEND_API_KEY</code> が必要です（未設定時は送付日時のみ記録）。
-          </p>
         </div>
       ) : null}
     </div>

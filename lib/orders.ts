@@ -78,6 +78,14 @@ const listSelectLegacy = [
   "delivery_time",
 ].join(", ")
 
+
+function withSupabaseErrorHint(message: string): string {
+  if (/fetch failed|TypeError:\s*fetch failed/i.test(message)) {
+    return `${message} Supabase への通信に失敗しました。ネットワーク接続を確認し、\`npm run dev:clean\` で再起動してください。`
+  }
+  return message
+}
+
 function listQuery(supabase: NonNullable<ReturnType<typeof getSupabaseAdmin>>, select: string) {
   return supabase.from("orders").select(select).order("delivery_date", { ascending: true, nullsFirst: true }).order("created_at", {
     ascending: true,
@@ -102,7 +110,7 @@ export async function fetchOrdersList(limit = 200): Promise<{ ok: true; rows: Or
       /admin_opened_at|invoice_issued_at|invoice_sent_at|column/i.test(error.message)
         ? " Supabase の SQL エディタで `supabase/migrations/20260513120000_order_admin_invoice.sql` を実行してください。"
         : ""
-    return { ok: false, message: `${error.message}${hint}` }
+    return { ok: false, message: withSupabaseErrorHint(`${error.message}${hint}`) }
   }
 
   const rows = (data ?? []) as unknown as OrderRow[]
@@ -125,7 +133,7 @@ export async function fetchOrderWithItems(
       /admin_opened_at|invoice_issued_at|invoice_sent_at|column/i.test(orderErr.message)
         ? " `supabase/migrations/20260513120000_order_admin_invoice.sql` を Supabase に適用してください。"
         : ""
-    return { ok: false, message: `${orderErr.message}${hint}` }
+    return { ok: false, message: withSupabaseErrorHint(`${orderErr.message}${hint}`) }
   }
   if (!order) {
     return { ok: false, message: "注文が見つかりません。" }
@@ -138,7 +146,7 @@ export async function fetchOrderWithItems(
     .order("sort_order", { ascending: true })
 
   if (itemsErr) {
-    return { ok: false, message: itemsErr.message }
+    return { ok: false, message: withSupabaseErrorHint(itemsErr.message) }
   }
 
   return {

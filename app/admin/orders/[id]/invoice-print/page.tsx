@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import { InvoiceFormalDocument } from "@/components/invoice-formal-document"
 import { InvoicePrintToolbar } from "@/components/invoice-print-toolbar"
 import { StoreOrderEmailBody } from "@/components/store-order-email-body"
 import { fetchOrderWithItems } from "@/lib/orders"
@@ -23,9 +24,12 @@ export default async function InvoicePrintPage({ params }: { params: { id: strin
   return (
     <div className="min-h-screen bg-white print:bg-white">
       <InvoicePrintToolbar orderId={params.id} />
-      <main className="print-invoice-root mx-auto max-w-[600px] bg-white px-2 pb-12 pt-4 print:px-0 print:pt-0">
-        <p className="no-print mb-2 text-center text-xs text-stone-500">SPAMS GOOD · {mainTitle}</p>
-        <StoreOrderEmailBody order={order} items={items} mainTitle={mainTitle} />
+      <main className="print-invoice-root mx-auto max-w-[210mm] bg-white px-2 pb-12 pt-4 print:max-w-none print:px-0 print:pb-0 print:pt-0">
+        {isInvoice ? (
+          <InvoiceFormalDocument order={order} items={items} />
+        ) : (
+          <StoreOrderEmailBody order={order} items={items} mainTitle={mainTitle} />
+        )}
       </main>
     </div>
   )

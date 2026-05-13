@@ -5,15 +5,16 @@ import type { OrderItemRow, OrderRow } from "@/lib/orders"
 type StoreOrderEmailBodyProps = {
   order: OrderRow
   items: OrderItemRow[]
-  /** 既定は店舗メールと同じ「新規注文を受け付けました」。印刷用ページでは「請求書」などに差し替え可能 */
+  /** 既定は「注文番号: ...」。印刷用ページでは「請求書」などに差し替え可能 */
   mainTitle?: string
 }
 
 /** 店舗向けメール（send-order-email の storeEmailHtml）と同じ情報・並び（HTML＋Tailwind） */
-export function StoreOrderEmailBody({ order, items, mainTitle = "新規注文を受け付けました" }: StoreOrderEmailBodyProps) {
+export function StoreOrderEmailBody({ order, items, mainTitle }: StoreOrderEmailBodyProps) {
   const { hasAddress, receivingText, deliveryFeeYen, deliveryFeeNote } = getDeliveryContext(order)
 
   const paymentText = paymentTextLikeStoreEmail(order)
+  const title = mainTitle ?? `注文番号: ${order.order_number?.trim() || order.id}`
 
   const caseLine = order.management_number?.trim() || ""
 
@@ -23,7 +24,7 @@ export function StoreOrderEmailBody({ order, items, mainTitle = "新規注文を
       style={{ fontFamily: "'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, sans-serif", lineHeight: 1.6 }}
     >
       <div className="mb-6 print:mb-5">
-        <h2 className="m-0 text-xl font-semibold leading-snug text-[#d97706] print:text-[22px]">{mainTitle}</h2>
+        <h2 className="m-0 text-xl font-semibold leading-snug text-[#d97706] print:text-[22px]">{title}</h2>
       </div>
 
       <div className="mb-8 print:mb-6">
