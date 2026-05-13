@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-stone-50 text-stone-900 antialiased;
+}
+
+@media print {
+  body {
+    @apply bg-white text-black;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-invoice-root {
+    max-width: 100% !important;
+  }
+  .store-order-email-view {
+    box-shadow: none !important;
+  }
+}

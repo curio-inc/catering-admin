@@ -1,0 +1,12 @@
+# ログ用・ビルド成果物
+.next/
+out/
+node_modules/
+
+# 環境変数（秘密情報をコミットしない）
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
