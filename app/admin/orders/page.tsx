@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { updateOrderStatusAction } from "@/app/admin/orders/actions"
+import { LogoutButton } from "@/components/logout-button"
 import { OrderStatusSelect } from "@/components/order-status-select"
 import { SalesFilterBar } from "@/components/sales-filter-bar"
 import { fetchOrdersList } from "@/lib/orders"
@@ -85,6 +86,7 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
             <p className="text-sm font-medium opacity-90">SPAMS GOOD</p>
             <h1 className="text-xl font-bold tracking-tight sm:text-2xl">注文管理</h1>
           </div>
+          <LogoutButton />
         </div>
       </header>
 
