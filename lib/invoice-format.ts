@@ -11,6 +11,18 @@ export function formatJapaneseDate(iso: string): string {
   }).format(d)
 }
 
+/** 月日のみ（例: 4月20日） */
+export function formatMonthDay(dateStr: string | null | undefined): string {
+  if (!dateStr) return "—"
+  const d = new Date(dateStr)
+  if (Number.isNaN(d.getTime())) return "—"
+  return new Intl.DateTimeFormat("ja-JP", {
+    month: "long",
+    day: "numeric",
+    timeZone: "Asia/Tokyo",
+  }).format(d)
+}
+
 export function formatInvoiceNumber(order: OrderRow): string {
   const n = order.order_number?.trim()
   if (n) return n

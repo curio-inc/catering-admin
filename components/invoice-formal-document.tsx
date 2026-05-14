@@ -1,5 +1,5 @@
 import { getInvoiceIssuer } from "@/lib/invoice-issuer"
-import { formatInvoiceNumber, formatJapaneseDate, formatYen, inferTaxPercentLabel } from "@/lib/invoice-format"
+import { formatInvoiceNumber, formatJapaneseDate, formatMonthDay, formatYen, inferTaxPercentLabel } from "@/lib/invoice-format"
 import { getDeliveryContext } from "@/lib/order-delivery-context"
 import type { OrderItemRow, OrderRow } from "@/lib/orders"
 
@@ -47,18 +47,34 @@ export function InvoiceFormalDocument({ order, items }: InvoiceFormalDocumentPro
       className="invoice-formal invoice-formal-a4 mx-auto max-w-[210mm] px-6 py-8 text-[13px] text-black print:max-w-none print:px-0 print:py-0 print:text-[11px] print:leading-snug"
       style={{ fontFamily: jpSans, lineHeight: 1.65 }}
     >
-      <h1 className="m-0 text-center text-2xl font-bold tracking-[0.2em] print:text-[20px] print:tracking-[0.15em]">
-        請求書
+      <h1 className="m-0 text-left text-2xl font-bold tracking-[0.1em] print:text-[20px]">
+        請求書<span className="text-[18px] font-bold print:text-[16px]">（ケータリングサービス）</span>
       </h1>
+      <hr className="my-3 border-t-2 border-black print:my-2" />
 
-      <div className="mt-8 flex flex-wrap items-start justify-between gap-6 print:mt-3 print:gap-3">
+      <div className="mt-4 flex flex-wrap items-start justify-between gap-6 print:mt-2 print:gap-3">
         <div className="min-w-[200px] flex-1">
           <p className="m-0 text-[17px] font-semibold leading-snug print:text-[13px]">{recipientLine}</p>
-          {billingAddr ? (
-            <p className="mt-3 whitespace-pre-wrap text-[12px] leading-relaxed text-stone-700 print:mt-1 print:text-[10px]">
-              {billingAddr}
+          <div className="mt-4 space-y-1 text-[13px] leading-relaxed print:mt-2 print:text-[11px]">
+            <p className="m-0">
+              <span className="inline-block w-[6em] text-stone-700">取引方法</span>
+              銀行振込
             </p>
-          ) : null}
+            {order.delivery_date ? (
+              <p className="m-0">
+                <span className="inline-block w-[6em] text-stone-700">実施期間</span>
+                {formatMonthDay(order.delivery_date)}
+              </p>
+            ) : null}
+            <p className="m-0">
+              <span className="inline-block w-[6em] text-stone-700">振込期日</span>
+              月末締め翌月末迄
+            </p>
+          </div>
+          <div className="mt-4 text-[13px] print:mt-2 print:text-[11px]">
+            <p className="m-0 text-stone-700">商品及びサービス名</p>
+            <p className="m-0">お弁当/ケータリング</p>
+          </div>
         </div>
         <div className="w-full max-w-[300px] text-right sm:w-auto print:max-w-[48%]">
           <p className="m-0">
@@ -72,9 +88,9 @@ export function InvoiceFormalDocument({ order, items }: InvoiceFormalDocumentPro
           <div className="mt-6 border-t border-stone-200 pt-4 text-left text-[12px] leading-relaxed print:mt-2 print:pt-2 print:text-[10px]">
             <p className="m-0 font-semibold">{issuer.companyName}</p>
             {issuer.repName.trim() ? <p className="m-0 mt-1">{issuer.repName}</p> : null}
-            <p className={`m-0 ${issuer.repName.trim() ? "mt-2" : "mt-1"}`}>
+            <p className={`m-0 whitespace-pre-wrap ${issuer.repName.trim() ? "mt-2" : "mt-1"}`}>
               {issuer.postalCode}
-              <br />
+              {"\n"}
               {issuer.addressLines}
             </p>
             <p className="m-0 mt-2">
@@ -82,6 +98,12 @@ export function InvoiceFormalDocument({ order, items }: InvoiceFormalDocumentPro
               <br />
               {issuer.email}
             </p>
+            {issuer.registrationNumber.trim() ? (
+              <p className="m-0 mt-2 text-[11px] text-stone-600 print:text-[9px]">
+                適格請求書発行事業者登録番号<br />
+                {issuer.registrationNumber}
+              </p>
+            ) : null}
           </div>
         </div>
       </div>
