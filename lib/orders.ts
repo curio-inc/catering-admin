@@ -1,4 +1,10 @@
+import { isDemoMode } from "@/lib/demo-mode"
+import { MOCK_ORDER_ITEMS, MOCK_ORDERS } from "@/lib/mock-orders"
 import { describeSupabaseEnvGap, getSupabaseAdmin } from "@/lib/supabase-admin"
+
+function useMock(): boolean {
+  return isDemoMode()
+}
 
 /** `public.orders`（管理用カラム含む） */
 export type OrderRow = {
@@ -93,6 +99,10 @@ function listQuery(supabase: NonNullable<ReturnType<typeof getSupabaseAdmin>>, s
 }
 
 export async function fetchOrdersList(limit = 200): Promise<{ ok: true; rows: OrderRow[] } | { ok: false; message: string }> {
+  if (useMock()) {
+    return { ok: true, rows: MOCK_ORDERS.slice(0, limit) }
+  }
+
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     const gap = describeSupabaseEnvGap()
@@ -120,6 +130,13 @@ export async function fetchOrdersList(limit = 200): Promise<{ ok: true; rows: Or
 export async function fetchOrderWithItems(
   id: string,
 ): Promise<{ ok: true; order: OrderRow; items: OrderItemRow[] } | { ok: false; message: string }> {
+  if (useMock()) {
+    const order = MOCK_ORDERS.find((o) => o.id === id)
+    if (!order) return { ok: false, message: "注文が見つかりません。" }
+    const items = MOCK_ORDER_ITEMS[id] ?? []
+    return { ok: true, order, items }
+  }
+
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     const gap = describeSupabaseEnvGap()

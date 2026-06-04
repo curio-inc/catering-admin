@@ -1,3 +1,4 @@
+import { getAppBrand } from "@/lib/app-brand"
 import type { OrderRow } from "@/lib/orders"
 
 export function formatJapaneseDate(iso: string): string {
@@ -30,7 +31,7 @@ export function formatInvoiceNumber(order: OrderRow): string {
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, "0")
   const tail = order.id.replace(/-/g, "").slice(0, 6).toUpperCase()
-  return `SG-${y}${m}-${tail}`
+  return `${getAppBrand().orderNumberPrefix}${y}${m}-${tail}`
 }
 
 export function formatYen(amount: number): string {

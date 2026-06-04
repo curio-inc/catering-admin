@@ -3,9 +3,6 @@ import { formatInvoiceNumber, formatJapaneseDate, formatMonthDay, formatYen, inf
 import { getDeliveryContext } from "@/lib/order-delivery-context"
 import type { OrderItemRow, OrderRow } from "@/lib/orders"
 
-/** 印刷1枚に収めやすいよう空行は最小限 */
-const MIN_LINE_ROWS = 2
-
 const jpSans =
   "'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, 'Noto Sans JP', sans-serif"
 
@@ -26,14 +23,11 @@ export function InvoiceFormalDocument({ order, items }: InvoiceFormalDocumentPro
     ? `${order.invoice_company_name} 御中`
     : `${order.customer_name} 様`
 
-  const billingAddr = order.invoice_billing_address?.trim()
-
   const due = new Date(billIso)
   due.setDate(due.getDate() + issuer.paymentDueDays)
   const dueLabel = formatJapaneseDate(due.toISOString())
 
   const tableRows = buildTableRows(order, items, hasAddress, deliveryFeeYen)
-  const padCount = Math.max(0, MIN_LINE_ROWS - tableRows.length)
 
   const taxableBase = order.subtotal_yen + (hasAddress ? deliveryFeeYen : 0)
   const taxLabel = inferTaxPercentLabel(order.tax_yen, taxableBase)
@@ -44,63 +38,64 @@ export function InvoiceFormalDocument({ order, items }: InvoiceFormalDocumentPro
 
   return (
     <div
-      className="invoice-formal invoice-formal-a4 mx-auto max-w-[210mm] px-6 py-8 text-[13px] text-black print:max-w-none print:px-0 print:py-0 print:text-[11px] print:leading-snug"
-      style={{ fontFamily: jpSans, lineHeight: 1.65 }}
+      className="invoice-formal invoice-formal-a4 invoice-formal-one-page"
+      style={{ fontFamily: jpSans }}
     >
-      <h1 className="m-0 text-left text-2xl font-bold tracking-[0.1em] print:text-[20px]">
-        請求書<span className="text-[18px] font-bold print:text-[16px]">（ケータリングサービス）</span>
+      <h1 className="invoice-formal-title">
+        請求書<span className="invoice-formal-title-sub">（ケータリングサービス）</span>
       </h1>
-      <hr className="my-3 border-t-2 border-black print:my-2" />
+      <hr className="invoice-formal-rule" />
 
-      <div className="mt-4 flex flex-wrap items-start justify-between gap-6 print:mt-2 print:gap-3">
-        <div className="min-w-[200px] flex-1">
-          <p className="m-0 text-[17px] font-semibold leading-snug print:text-[13px]">{recipientLine}</p>
-          <div className="mt-4 space-y-1 text-[13px] leading-relaxed print:mt-2 print:text-[11px]">
-            <p className="m-0">
-              <span className="inline-block w-[6em] text-stone-700">取引方法</span>
+      <div className="invoice-formal-header">
+        <div className="invoice-formal-header-left">
+          <p className="invoice-formal-recipient">{recipientLine}</p>
+          <div className="invoice-formal-meta">
+            <p>
+              <span className="invoice-formal-meta-label">取引方法</span>
               銀行振込
             </p>
             {order.delivery_date ? (
-              <p className="m-0">
-                <span className="inline-block w-[6em] text-stone-700">実施期間</span>
+              <p>
+                <span className="invoice-formal-meta-label">実施期間</span>
                 {formatMonthDay(order.delivery_date)}
               </p>
             ) : null}
-            <p className="m-0">
-              <span className="inline-block w-[6em] text-stone-700">振込期日</span>
+            <p>
+              <span className="invoice-formal-meta-label">振込期日</span>
               月末締め翌月末迄
             </p>
           </div>
-          <div className="mt-4 text-[13px] print:mt-2 print:text-[11px]">
-            <p className="m-0 text-stone-700">商品及びサービス名</p>
-            <p className="m-0">お弁当/ケータリング</p>
+          <div className="invoice-formal-service">
+            <p className="invoice-formal-muted">商品及びサービス名</p>
+            <p>お弁当/ケータリング</p>
           </div>
         </div>
-        <div className="w-full max-w-[300px] text-right sm:w-auto print:max-w-[48%]">
-          <p className="m-0">
-            <span className="text-stone-600">請求日</span>{" "}
-            <span className="font-medium">{billDateLabel}</span>
+        <div className="invoice-formal-header-right">
+          <p>
+            <span className="invoice-formal-muted">請求日</span>{" "}
+            <span className="invoice-formal-strong">{billDateLabel}</span>
           </p>
-          <p className="mt-2 print:mt-1">
-            <span className="text-stone-600">請求書番号</span>{" "}
-            <span className="font-medium">{invoiceNo}</span>
+          <p className="invoice-formal-header-gap">
+            <span className="invoice-formal-muted">請求書番号</span>{" "}
+            <span className="invoice-formal-strong">{invoiceNo}</span>
           </p>
-          <div className="mt-6 border-t border-stone-200 pt-4 text-left text-[12px] leading-relaxed print:mt-2 print:pt-2 print:text-[10px]">
-            <p className="m-0 font-semibold">{issuer.companyName}</p>
-            {issuer.repName.trim() ? <p className="m-0 mt-1">{issuer.repName}</p> : null}
-            <p className={`m-0 whitespace-pre-wrap ${issuer.repName.trim() ? "mt-2" : "mt-1"}`}>
+          <div className="invoice-formal-issuer">
+            <p className="invoice-formal-strong">{issuer.companyName}</p>
+            {issuer.repName.trim() ? <p>{issuer.repName}</p> : null}
+            <p className="invoice-formal-issuer-address">
               {issuer.postalCode}
               {"\n"}
               {issuer.addressLines}
             </p>
-            <p className="m-0 mt-2">
+            <p>
               {issuer.tel}
               <br />
               {issuer.email}
             </p>
             {issuer.registrationNumber.trim() ? (
-              <p className="m-0 mt-2 text-[11px] text-stone-600 print:text-[9px]">
-                適格請求書発行事業者登録番号<br />
+              <p className="invoice-formal-registration">
+                適格請求書発行事業者登録番号
+                <br />
                 {issuer.registrationNumber}
               </p>
             ) : null}
@@ -108,93 +103,65 @@ export function InvoiceFormalDocument({ order, items }: InvoiceFormalDocumentPro
         </div>
       </div>
 
-      <section className="mt-10 print:mt-3 print:break-inside-avoid">
-        <p className="m-0 text-sm font-medium text-stone-800 print:text-xs">請求金額</p>
-        <p className="mt-2 border-b-[3px] border-black pb-0.5 text-3xl font-bold tracking-wide print:mt-1 print:border-b-2 print:text-[22px]">
-          {formatYen(order.total_yen)}
-        </p>
+      <section className="invoice-formal-total-block">
+        <p className="invoice-formal-total-label">請求金額</p>
+        <p className="invoice-formal-total-amount">{formatYen(order.total_yen)}</p>
       </section>
 
-      <section className="mt-8 print:mt-3 print:break-inside-avoid">
-        <table className="w-full border-collapse border border-black text-[12px] print:text-[10px]">
+      <section className="invoice-formal-lines">
+        <table className="invoice-formal-table">
           <thead>
-            <tr className="bg-black text-white">
-              <th className="border border-black px-2 py-2 text-left font-semibold print:px-1.5 print:py-1">品名</th>
-              <th className="w-[22%] border border-black px-2 py-2 text-right font-semibold print:px-1.5 print:py-1">単価</th>
-              <th className="w-[14%] border border-black px-2 py-2 text-center font-semibold print:px-1.5 print:py-1">数量</th>
-              <th className="w-[22%] border border-black px-2 py-2 text-right font-semibold print:px-1.5 print:py-1">金額</th>
+            <tr>
+              <th>品名</th>
+              <th className="invoice-formal-col-num">単価</th>
+              <th className="invoice-formal-col-qty">数量</th>
+              <th className="invoice-formal-col-num">金額</th>
             </tr>
           </thead>
           <tbody>
             {tableRows.map((row, i) => (
-              <tr key={i} className="align-top">
-                <td className="border border-stone-400 px-2 py-1.5 text-left print:px-1.5 print:py-1">{row.name}</td>
-                <td className="border border-stone-400 px-2 py-1.5 text-right tabular-nums print:px-1.5 print:py-1">
-                  {formatYen(row.unit)}
-                </td>
-                <td className="border border-stone-400 px-2 py-1.5 text-center print:px-1.5 print:py-1">{row.qtyLabel}</td>
-                <td className="border border-stone-400 px-2 py-1.5 text-right tabular-nums print:px-1.5 print:py-1">
-                  {formatYen(row.amount)}
-                </td>
-              </tr>
-            ))}
-            {Array.from({ length: padCount }).map((_, i) => (
-              <tr key={`pad-${i}`}>
-                <td className="h-7 border border-stone-300 px-2 py-0.5 print:h-6">&nbsp;</td>
-                <td className="border border-stone-300 px-2 py-0.5">&nbsp;</td>
-                <td className="border border-stone-300 px-2 py-0.5">&nbsp;</td>
-                <td className="border border-stone-300 px-2 py-0.5">&nbsp;</td>
+              <tr key={i}>
+                <td>{row.name}</td>
+                <td className="invoice-formal-col-num">{formatYen(row.unit)}</td>
+                <td className="invoice-formal-col-qty">{row.qtyLabel}</td>
+                <td className="invoice-formal-col-num">{formatYen(row.amount)}</td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        <div className="mt-4 flex justify-end print:mt-2 print:break-inside-avoid">
-          <table className="w-full max-w-[260px] border-collapse border border-stone-400 text-[12px] print:max-w-[220px] print:text-[10px]">
+        <div className="invoice-formal-summary-wrap">
+          <table className="invoice-formal-summary">
             <tbody>
               <tr>
-                <th className="border border-stone-400 bg-stone-200 px-3 py-1.5 text-left font-normal print:px-2 print:py-1">
-                  小計
-                </th>
-                <td className="border border-stone-400 px-3 py-1.5 text-right tabular-nums font-medium print:px-2 print:py-1">
-                  {formatYen(taxableBase)}
-                </td>
+                <th>小計</th>
+                <td>{formatYen(taxableBase)}</td>
               </tr>
               <tr>
-                <th className="border border-stone-400 bg-stone-200 px-3 py-1.5 text-left font-normal print:px-2 print:py-1">
-                  消費税（{taxLabel}%）
-                </th>
-                <td className="border border-stone-400 px-3 py-1.5 text-right tabular-nums font-medium print:px-2 print:py-1">
-                  {formatYen(order.tax_yen)}
-                </td>
+                <th>消費税（{taxLabel}%）</th>
+                <td>{formatYen(order.tax_yen)}</td>
               </tr>
               <tr>
-                <th className="border border-stone-400 bg-stone-300 px-3 py-1.5 text-left font-semibold print:px-2 print:py-1">
-                  合計
-                </th>
-                <td className="border border-stone-400 px-3 py-1.5 text-right text-base font-bold tabular-nums print:px-2 print:py-1 print:text-[12px]">
-                  {formatYen(order.total_yen)}
-                </td>
+                <th className="invoice-formal-summary-grand-label">合計</th>
+                <td className="invoice-formal-summary-grand-value">{formatYen(order.total_yen)}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <footer className="mt-10 space-y-4 text-[12px] print:mt-3 print:space-y-1.5 print:text-[10px]">
+      <footer className="invoice-formal-footer">
         <div>
-          <p className="m-0 font-semibold text-stone-900">振込期日</p>
-          <p className="m-0 mt-1">{dueLabel}</p>
+          <p className="invoice-formal-footer-label">振込期日</p>
+          <p>{dueLabel}</p>
         </div>
         <div>
-          <p className="m-0 font-semibold text-stone-900">お振込先</p>
-          <pre className="m-0 mt-1 whitespace-pre-wrap font-sans leading-relaxed">{issuer.bankLines}</pre>
+          <p className="invoice-formal-footer-label">お振込先</p>
+          <pre className="invoice-formal-bank">{issuer.bankLines}</pre>
         </div>
-        <div className="rounded-sm border border-stone-800 px-3 py-3 print:px-2 print:py-2 print:break-inside-auto">
-          <p className="m-0 mb-2 text-xs font-semibold text-stone-800 print:mb-1 print:text-[10px]">備考</p>
-          <p className="m-0 whitespace-pre-wrap leading-relaxed text-stone-800 print:leading-snug">
-            {remarks.filter(Boolean).join("\n\n")}
-          </p>
+        <div className="invoice-formal-remarks-box">
+          <p className="invoice-formal-remarks-title">備考</p>
+          <p className="invoice-formal-remarks-body">{remarks.filter(Boolean).join("\n\n")}</p>
         </div>
       </footer>
     </div>

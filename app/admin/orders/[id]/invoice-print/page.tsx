@@ -1,4 +1,5 @@
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
+import { isDemoMode } from "@/lib/demo-mode"
 import { InvoiceFormalDocument } from "@/components/invoice-formal-document"
 import { InvoicePrintToolbar } from "@/components/invoice-print-toolbar"
 import { StoreOrderEmailBody } from "@/components/store-order-email-body"
@@ -7,6 +8,10 @@ import { fetchOrderWithItems } from "@/lib/orders"
 export const dynamic = "force-dynamic"
 
 export default async function InvoicePrintPage({ params }: { params: { id: string } }) {
+  if (isDemoMode()) {
+    redirect(`/admin/orders?panel=invoices&order=${encodeURIComponent(params.id)}`)
+  }
+
   const res = await fetchOrderWithItems(params.id)
   if (!res.ok) {
     if (res.message === "注文が見つかりません。") notFound()

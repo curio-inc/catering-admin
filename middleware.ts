@@ -1,8 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { unsealData } from "iron-session"
+import { isDemoMode } from "@/lib/demo-mode"
 import { sessionOptions, type SessionData } from "@/lib/session"
 
 export async function middleware(request: NextRequest) {
+  if (isDemoMode()) {
+    return NextResponse.next()
+  }
+
   const { pathname } = request.nextUrl
 
   // /admin/login と /admin/logout は認証不要

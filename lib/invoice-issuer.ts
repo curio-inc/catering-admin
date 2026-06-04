@@ -1,4 +1,6 @@
-/** 請求書に印字する自社情報（未設定時はプレースホルダ。`.env.local` で上書き） */
+import { getAppBrand } from "@/lib/app-brand"
+
+/** 請求書に印字する自社情報（未設定時はデモ用プレースホルダ。`.env.local` で上書き） */
 
 export type InvoiceIssuer = {
   companyName: string
@@ -23,24 +25,25 @@ function env(name: string, fallback: string): string {
 }
 
 export function getInvoiceIssuer(): InvoiceIssuer {
+  const brand = getAppBrand()
   const bankRaw = env(
     "INVOICE_BANK_LINES",
     [
-      "城南信用金庫　営業部本店",
+      "サンプル銀行　本店営業部",
       "口座種別　普通預金",
-      "口座番号　868006",
-      "カブシキカイシャ　スパムズグッド",
+      "口座番号　1234567",
+      "カ）サンプル",
     ].join("\n"),
   ).replace(/\\n/g, "\n")
 
   return {
-    companyName: env("INVOICE_ISSUER_COMPANY", "株式会社 SPAMS GOOD"),
-    repName: env("INVOICE_ISSUER_REP", ""),
-    postalCode: env("INVOICE_ISSUER_POSTAL", "〒106-0032"),
-    addressLines: env("INVOICE_ISSUER_ADDRESS", "東京都港区六本木5-11-32\n第三岩崎ビル4階").replace(/\\n/g, "\n"),
-    tel: env("INVOICE_ISSUER_TEL", "03-5772-5273"),
-    email: env("INVOICE_ISSUER_EMAIL", "yamada@kai-juban.com"),
-    registrationNumber: env("INVOICE_ISSUER_REGISTRATION_NUMBER", "T6010401154826"),
+    companyName: brand.legalCompanyName,
+    repName: env("INVOICE_ISSUER_REP", "山田 太郎"),
+    postalCode: env("INVOICE_ISSUER_POSTAL", "〒100-0001"),
+    addressLines: env("INVOICE_ISSUER_ADDRESS", "東京都千代田区丸の内1-1-1\nサンプルビル3階").replace(/\\n/g, "\n"),
+    tel: env("INVOICE_ISSUER_TEL", "03-0000-0000"),
+    email: brand.contactEmail,
+    registrationNumber: env("INVOICE_ISSUER_REGISTRATION_NUMBER", "T0000000000001"),
     bankLines: bankRaw,
     paymentDueDays: Math.max(1, Number.parseInt(env("INVOICE_PAYMENT_DUE_DAYS", "30"), 10) || 30),
     transferFeeNote: env(

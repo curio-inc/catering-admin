@@ -3,7 +3,7 @@ export function formatPaymentMethod(paymentMethod: string, paymentMethodLabel: s
   if (paymentMethodLabel?.trim()) return paymentMethodLabel.trim()
   const m = paymentMethod?.toLowerCase() ?? ""
   if (m === "invoice") return "請求書払い"
-  if (m === "credit" || m === "card") return "クレジットカード"
+  if (m === "credit" || m === "card" || m === "credit_card") return "クレジットカード"
   if (m === "cash") return "現金払い"
   return paymentMethod || "—"
 }

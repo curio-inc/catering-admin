@@ -1,7 +1,11 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { DemoOrderDetailPage } from "@/app/admin/orders/[id]/demo-order-detail-page"
+import { getAppBrand } from "@/lib/app-brand"
+import { isDemoMode } from "@/lib/demo-mode"
 import { SendInvoiceButton } from "@/components/send-invoice-button"
 import { StoreOrderEmailBody } from "@/components/store-order-email-body"
+import { isServerlessPdfEnvironment } from "@/lib/invoice-pdf"
 import { fetchOrderWithItems } from "@/lib/orders"
 import { issueInvoiceAction, markOrderOpened, sendInvoiceAction } from "../actions"
 
@@ -21,6 +25,26 @@ function formatTs(iso: string | null | undefined) {
 }
 
 export default async function AdminOrderDetailPage({ params }: { params: { id: string } }) {
+  if (isDemoMode()) {
+    const brand = getAppBrand()
+    const backUrl = process.env.NEXT_PUBLIC_DEMO_BACK_URL?.trim() || undefined
+    const res = await fetchOrderWithItems(params.id)
+    if (!res.ok) {
+      if (res.message === "注文が見つかりません。") notFound()
+      return (
+        <div className="mx-auto max-w-3xl p-6">
+          <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">{res.message}</p>
+          <Link href="/admin/orders" className="demo-back mt-4 inline-block">
+            ← 注文一覧
+          </Link>
+        </div>
+      )
+    }
+    return (
+      <DemoOrderDetailPage order={res.order} items={res.items} brandName={brand.displayName} backUrl={backUrl} />
+    )
+  }
+
   await markOrderOpened(params.id)
   const res = await fetchOrderWithItems(params.id)
   if (!res.ok) {
@@ -39,6 +63,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
   const isInvoice = order.payment_method === "invoice"
   const issued = !!order.invoice_issued_at
   const sent = !!order.invoice_sent_at
+  const serverlessPdf = isServerlessPdfEnvironment()
 
   return (
     <div className="min-h-screen bg-white">
@@ -61,22 +86,31 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
               送付: {order.invoice_sent_at ? <strong>{formatTs(order.invoice_sent_at)}</strong> : "未送付"}
             </li>
           </ul>
-          <div className="flex flex-wrap items-center gap-3">
-            <form action={issueInvoiceAction}>
-              <input type="hidden" name="orderId" value={order.id} />
-              <button
-                type="submit"
-                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-amber-700"
-              >
-                PDF発行
-              </button>
-            </form>
-            <SendInvoiceButton
-              orderId={order.id}
-              issued={issued}
-              sent={sent}
-              action={sendInvoiceAction}
-            />
+          {serverlessPdf ? (
+            <p className="mb-4 rounded-lg border border-amber-300 bg-amber-100/80 px-3 py-2 text-xs leading-relaxed text-amber-950">
+              メール送付時のPDF自動生成は Playwright（Chromium）に依存しています。Vercel
+              などのサーバーレス環境では Chromium を起動できず失敗する場合があります。「PDF発行」→
+              ブラウザの印刷機能での保存・手動送付をご利用ください。
+            </p>
+          ) : null}
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <form action={issueInvoiceAction}>
+                <input type="hidden" name="orderId" value={order.id} />
+                <button
+                  type="submit"
+                  className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-amber-700"
+                >
+                  PDF発行
+                </button>
+              </form>
+              <SendInvoiceButton
+                orderId={order.id}
+                issued={issued}
+                sent={sent}
+                action={sendInvoiceAction}
+              />
+            </div>
           </div>
         </div>
       ) : null}

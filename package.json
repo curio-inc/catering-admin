@@ -9,11 +9,17 @@
     "dev:clean": "node ./dev-auto-port.mjs --clean --turbo",
     "build": "next build",
     "start": "next start -p 3000",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "node ./scripts/verify-next-swc.mjs"
+  },
+  "optionalDependencies": {
+    "@next/swc-darwin-arm64": "14.2.33"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.8",
+    "html2canvas": "^1.4.1",
     "iron-session": "^8.0.4",
+    "jspdf": "^4.2.1",
     "next": "14.2.35",
     "playwright": "^1.60.0",
     "react": "^18.3.1",

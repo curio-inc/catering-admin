@@ -37,23 +37,28 @@ export function SendInvoiceButton({ orderId, issued, sent, action }: Props) {
   }, [state])
 
   return (
-    <div className="flex items-center gap-3">
-      <form action={formAction}>
-        <input type="hidden" name="orderId" value={orderId} />
-        <fieldset disabled={!issued}>
-          <SubmitButton sent={sent} />
-        </fieldset>
-      </form>
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-3">
+        <form action={formAction}>
+          <input type="hidden" name="orderId" value={orderId} />
+          <fieldset disabled={!issued}>
+            <SubmitButton sent={sent} />
+          </fieldset>
+        </form>
 
-      {state && (
-        <span
-          className={`text-sm font-medium ${
-            state.ok ? "text-emerald-700" : "text-red-600"
-          }`}
+        {state?.ok ? (
+          <span className="text-sm font-medium text-emerald-700">{state.message}</span>
+        ) : null}
+      </div>
+
+      {state && !state.ok ? (
+        <p
+          role="alert"
+          className="max-w-xl rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm leading-relaxed text-red-800"
         >
           {state.message}
-        </span>
-      )}
+        </p>
+      ) : null}
     </div>
   )
 }

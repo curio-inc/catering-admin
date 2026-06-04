@@ -33,3 +33,273 @@ body {
     width: 100%;
   }
 }
+
+/* 請求書: A4 1枚に収めるコンパクトレイアウト（画面・PDFキャプチャ・印刷共通） */
+.invoice-formal-one-page {
+  box-sizing: border-box;
+  width: 210mm;
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 9mm 11mm 8mm;
+  color: #000;
+  font-size: 10px;
+  line-height: 1.4;
+  background: #fff;
+}
+
+.invoice-formal-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.invoice-formal-title-sub {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.invoice-formal-rule {
+  margin: 6px 0 8px;
+  border: 0;
+  border-top: 2px solid #000;
+}
+
+.invoice-formal-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 14px;
+}
+
+.invoice-formal-header-left {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.invoice-formal-header-right {
+  flex: 0 1 42%;
+  min-width: 180px;
+  text-align: right;
+}
+
+.invoice-formal-recipient {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.invoice-formal-meta {
+  margin-top: 6px;
+}
+
+.invoice-formal-meta p {
+  margin: 0 0 2px;
+}
+
+.invoice-formal-meta-label {
+  display: inline-block;
+  width: 5.5em;
+  color: #44403c;
+}
+
+.invoice-formal-service {
+  margin-top: 6px;
+}
+
+.invoice-formal-service p {
+  margin: 0;
+}
+
+.invoice-formal-muted {
+  color: #57534e;
+}
+
+.invoice-formal-strong {
+  font-weight: 600;
+}
+
+.invoice-formal-header-gap {
+  margin: 4px 0 0;
+}
+
+.invoice-formal-issuer {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid #d6d3d1;
+  text-align: left;
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.invoice-formal-issuer p {
+  margin: 0 0 3px;
+}
+
+.invoice-formal-issuer-address {
+  white-space: pre-wrap;
+}
+
+.invoice-formal-registration {
+  margin-top: 4px !important;
+  font-size: 8px;
+  color: #57534e;
+}
+
+.invoice-formal-total-block {
+  margin-top: 10px;
+}
+
+.invoice-formal-total-label {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: #292524;
+}
+
+.invoice-formal-total-amount {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.invoice-formal-lines {
+  margin-top: 8px;
+}
+
+.invoice-formal-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #000;
+  font-size: 9.5px;
+}
+
+.invoice-formal-table th,
+.invoice-formal-table td {
+  border: 1px solid #a8a29e;
+  padding: 3px 5px;
+  vertical-align: top;
+}
+
+.invoice-formal-table thead th {
+  border-color: #000;
+  background: #000;
+  color: #fff;
+  font-weight: 600;
+  text-align: left;
+}
+
+.invoice-formal-col-num {
+  width: 22%;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.invoice-formal-col-qty {
+  width: 12%;
+  text-align: center;
+}
+
+.invoice-formal-summary-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.invoice-formal-summary {
+  width: 100%;
+  max-width: 200px;
+  border-collapse: collapse;
+  border: 1px solid #a8a29e;
+  font-size: 9.5px;
+}
+
+.invoice-formal-summary th,
+.invoice-formal-summary td {
+  border: 1px solid #a8a29e;
+  padding: 3px 6px;
+}
+
+.invoice-formal-summary th {
+  background: #e7e5e4;
+  font-weight: 400;
+  text-align: left;
+}
+
+.invoice-formal-summary td {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.invoice-formal-summary-grand-label {
+  background: #d6d3d1 !important;
+  font-weight: 700 !important;
+}
+
+.invoice-formal-summary-grand-value {
+  font-size: 11px;
+  font-weight: 700 !important;
+}
+
+.invoice-formal-footer {
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+  font-size: 9.5px;
+}
+
+.invoice-formal-footer-label {
+  margin: 0 0 2px;
+  font-weight: 700;
+}
+
+.invoice-formal-footer p {
+  margin: 0;
+}
+
+.invoice-formal-bank {
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  white-space: pre-wrap;
+  line-height: 1.35;
+}
+
+.invoice-formal-remarks-box {
+  border: 1px solid #292524;
+  border-radius: 2px;
+  padding: 5px 7px;
+}
+
+.invoice-formal-remarks-title {
+  margin: 0 0 3px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.invoice-formal-remarks-body {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.35;
+}
+
+@media print {
+  .invoice-formal-one-page {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    font-size: 10px;
+    page-break-inside: avoid;
+  }
+
+  .invoice-formal-header,
+  .invoice-formal-total-block,
+  .invoice-formal-lines,
+  .invoice-formal-footer {
+    break-inside: avoid;
+  }
+}
