@@ -1,8 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { DemoOrderView, DemoUiStatus } from "@/lib/build-demo-view-model"
 import { DemoOrderStatusSelect } from "@/components/demo/demo-order-status-select"
+import {
+  getDemoDeliveryOverride,
+  rebuildDemoOrderViewWithDelivery,
+  writeDemoOrderDelivery,
+} from "@/lib/demo-order-delivery"
 import { getDemoUiStatus, writeDemoOrderStatus } from "@/lib/demo-order-status"
 
 function yen(n: number) {
@@ -12,15 +17,45 @@ function yen(n: number) {
 type DemoOrderDetailProps = {
   view: DemoOrderView
   onStatusChange?: (ui: DemoUiStatus) => void
+  onDeliveryChange?: (view: DemoOrderView) => void
+  onSaved?: (message: string) => void
 }
 
-export function DemoOrderDetail({ view, onStatusChange }: DemoOrderDetailProps) {
+export function DemoOrderDetail({ view, onStatusChange, onDeliveryChange, onSaved }: DemoOrderDetailProps) {
   const [uiStatus, setUiStatus] = useState<DemoUiStatus>(() => getDemoUiStatus(view.id, view.order.status))
+  const override = getDemoDeliveryOverride(view.id)
+  const [deliveryDate, setDeliveryDate] = useState(override?.deliveryDate ?? view.form.date)
+  const [deliveryTime, setDeliveryTime] = useState(override?.deliveryTime ?? view.form.time)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    const nextOverride = getDemoDeliveryOverride(view.id)
+    setDeliveryDate(nextOverride?.deliveryDate ?? view.form.date)
+    setDeliveryTime(nextOverride?.deliveryTime ?? view.form.time)
+  }, [view.id, view.form.date, view.form.time])
 
   function setStatus(next: DemoUiStatus) {
     setUiStatus(next)
     writeDemoOrderStatus(view.id, next)
     onStatusChange?.(next)
+  }
+
+  function handleSaveDelivery() {
+    if (!deliveryDate.trim()) {
+      onSaved?.("お届け日を入力してください")
+      return
+    }
+    if (!deliveryTime.trim()) {
+      onSaved?.("受け取り時間を入力してください")
+      return
+    }
+
+    setSaving(true)
+    writeDemoOrderDelivery(view.id, deliveryDate.trim(), deliveryTime.trim())
+    const nextView = rebuildDemoOrderViewWithDelivery(view, deliveryDate.trim(), deliveryTime.trim())
+    onDeliveryChange?.(nextView)
+    onSaved?.("お届け日時を保存しました")
+    setSaving(false)
   }
 
   return (
@@ -78,13 +113,23 @@ export function DemoOrderDetail({ view, onStatusChange }: DemoOrderDetailProps) 
               <input type="text" readOnly value={view.form.address} />
             </div>
           ) : null}
-          <div className="detail-field">
-            <label>お届け日／受取日</label>
-            <input type="text" readOnly value={view.form.date || "—"} />
+          <div className="detail-field detail-field--editable">
+            <label htmlFor={`delivery-date-${view.id}`}>お届け日／受取日</label>
+            <input
+              id={`delivery-date-${view.id}`}
+              type="date"
+              value={deliveryDate}
+              onChange={(e) => setDeliveryDate(e.target.value)}
+            />
           </div>
-          <div className="detail-field">
-            <label>お届け時間／受け取り時間</label>
-            <input type="text" readOnly value={view.form.time || "—"} />
+          <div className="detail-field detail-field--editable">
+            <label htmlFor={`delivery-time-${view.id}`}>お届け時間／受け取り時間</label>
+            <input
+              id={`delivery-time-${view.id}`}
+              type="time"
+              value={deliveryTime}
+              onChange={(e) => setDeliveryTime(e.target.value)}
+            />
           </div>
           <div className="detail-field" style={{ gridColumn: "1 / -1" }}>
             <label>備考・特別なご要望</label>
@@ -94,6 +139,11 @@ export function DemoOrderDetail({ view, onStatusChange }: DemoOrderDetailProps) 
             <label>案件名・案件番号</label>
             <input type="text" readOnly value={view.form.caseNameAndNumber} />
           </div>
+        </div>
+        <div className="row-actions">
+          <button type="button" className="btn btn-primary" onClick={handleSaveDelivery} disabled={saving}>
+            お届け日時を保存
+          </button>
         </div>
       </div>
 

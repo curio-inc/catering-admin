@@ -1,7 +1,11 @@
+"use client"
+
 import Link from "next/link"
+import { useCallback, useMemo, useRef, useState } from "react"
 import { DemoOrderDetail } from "@/components/demo/demo-order-detail"
 import { DemoPageShell } from "@/components/demo/demo-page-shell"
-import { orderToDemoView } from "@/lib/build-demo-view-model"
+import { orderToDemoView, type DemoOrderView } from "@/lib/build-demo-view-model"
+import { applyDemoDeliveries } from "@/lib/demo-order-delivery"
 import type { OrderItemRow, OrderRow } from "@/lib/orders"
 
 type DemoOrderDetailPageProps = {
@@ -12,7 +16,16 @@ type DemoOrderDetailPageProps = {
 }
 
 export function DemoOrderDetailPage({ order, items, brandName, backUrl }: DemoOrderDetailPageProps) {
-  const view = orderToDemoView(order, items)
+  const baseView = useMemo(() => orderToDemoView(order, items), [order, items])
+  const [view, setView] = useState<DemoOrderView>(() => applyDemoDeliveries([baseView])[0] ?? baseView)
+  const [toast, setToast] = useState("")
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const showToast = useCallback((msg: string) => {
+    setToast(msg)
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setToast(""), 2800)
+  }, [])
 
   return (
     <DemoPageShell brandName={brandName} backUrl={backUrl}>
@@ -29,9 +42,18 @@ export function DemoOrderDetailPage({ order, items, brandName, backUrl }: DemoOr
           <span>{view.customerName}</span>
         </p>
         <div className="admin-workspace">
-          <DemoOrderDetail view={view} />
+          <DemoOrderDetail
+            view={view}
+            onDeliveryChange={setView}
+            onSaved={showToast}
+          />
         </div>
       </main>
+      {toast ? (
+        <div className="demo-toast" role="status">
+          {toast}
+        </div>
+      ) : null}
     </DemoPageShell>
   )
 }

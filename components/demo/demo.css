@@ -365,6 +365,14 @@
   font-family: inherit;
   background: var(--white);
 }
+.detail-field--editable input:not([readonly]) {
+  border-color: #d97706;
+  background: #fffbeb;
+}
+.detail-field--editable input:not([readonly]):focus {
+  outline: 2px solid rgba(217, 119, 6, 0.35);
+  outline-offset: 1px;
+}
 .detail-field textarea {
   min-height: 72px;
   resize: vertical;

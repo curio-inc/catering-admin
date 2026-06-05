@@ -11,6 +11,7 @@ import { DemoSettingsPanel } from "@/components/demo/demo-settings-panel"
 import type { DemoOrderView, DemoUiStatus } from "@/lib/build-demo-view-model"
 import { filterOrdersByDeliveryMonth, sortDemoOrders } from "@/lib/build-demo-view-model"
 import { isDemoInvoiceSent, markDemoInvoiceSent, readDemoInvoiceSent } from "@/lib/demo-invoice-sent"
+import { applyDemoDeliveries } from "@/lib/demo-order-delivery"
 import { applyDemoStatuses, writeDemoOrderStatus } from "@/lib/demo-order-status"
 import {
   buildInvoicePdfDownloadName,
@@ -90,7 +91,7 @@ export function AdminDemoApp({
   }, [])
 
   const refreshOrders = useCallback(() => {
-    setOrders(applyDemoStatuses(initialOrders))
+    setOrders(applyDemoDeliveries(applyDemoStatuses(initialOrders)))
   }, [initialOrders])
 
   useEffect(() => {
