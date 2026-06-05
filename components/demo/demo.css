@@ -14,7 +14,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: "Noto Sans JP", sans-serif;
+  font-family: var(--font-noto), sans-serif;
   background: var(--bg);
   color: var(--ink);
 }
@@ -31,7 +31,7 @@
 }
 
 .demo-back {
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
   font-weight: 700;
   font-size: 0.88rem;
   color: var(--primary);
@@ -45,7 +45,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
   font-weight: 900;
   font-size: 1.1rem;
   color: var(--ink);
@@ -98,7 +98,7 @@
   border: none;
   background: transparent;
   padding: 0.75rem 1.25rem;
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
   font-weight: 800;
   font-size: 0.88rem;
   color: var(--ink-soft);
@@ -117,7 +117,7 @@
 }
 .demo-nav-btn span {
   display: block;
-  font-family: "Noto Sans JP", sans-serif;
+  font-family: var(--font-noto), sans-serif;
   font-weight: 500;
   font-size: 0.72rem;
   color: var(--muted);
@@ -159,6 +159,30 @@
   margin: 0 0.35rem;
 }
 
+.demo-order-detail-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.demo-order-detail-head .demo-panel-title {
+  margin-bottom: 0.35rem;
+}
+
+.demo-order-detail-head .demo-order-meta {
+  margin-bottom: 0;
+}
+
+.demo-receipt-btn {
+  flex-shrink: 0;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
 .demo-panel {
   display: none;
 }
@@ -177,7 +201,7 @@
 }
 
 .demo-panel-title {
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
   font-weight: 900;
   font-size: 1.35rem;
   margin: 0 0 0.35rem;
@@ -217,7 +241,7 @@
 }
 .month-sales-card .month-sales-total {
   margin: 0;
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
   font-weight: 900;
   font-size: 1.35rem;
   color: var(--primary);
@@ -261,7 +285,7 @@
   margin: 0 0 0.5rem;
   font-size: 0.9rem;
   font-weight: 800;
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
   color: var(--ink-soft);
 }
 .order-section--list {
@@ -303,7 +327,7 @@
   white-space: nowrap;
 }
 .demo-open-link {
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
   font-weight: 800;
   font-size: 0.82rem;
   color: var(--primary);
@@ -356,6 +380,7 @@
   margin-bottom: 0.25rem;
 }
 .detail-field input,
+.detail-field select,
 .detail-field textarea {
   width: 100%;
   padding: 0.45rem 0.55rem;
@@ -377,16 +402,44 @@
   min-height: 72px;
   resize: vertical;
 }
+.detail-field-inline {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.detail-field-inline select {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+.detail-field-inline input {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+.detail-field-inline .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 
 .line-items-block {
   margin-top: 1rem;
   border-top: 1px dashed var(--line);
   padding-top: 1rem;
 }
+
+.line-items-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
 .line-items-block h4 {
-  margin: 0 0 0.65rem;
+  margin: 0;
   font-size: 0.85rem;
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
 }
 
 .row-actions {
@@ -398,7 +451,7 @@
 }
 
 .btn {
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
   font-weight: 800;
   font-size: 0.82rem;
   padding: 0.55rem 1rem;
@@ -503,7 +556,7 @@
   margin: 0 0 1rem;
   font-size: 0.9rem;
   font-weight: 800;
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
   color: var(--ink-soft);
 }
 .settings-stop-list {
@@ -524,7 +577,7 @@
   margin-bottom: 0.75rem;
 }
 .settings-stop-index {
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
   font-weight: 800;
   font-size: 0.78rem;
   color: var(--muted);
@@ -579,7 +632,7 @@
   padding: 0.45rem 2rem 0.45rem 0.65rem;
   border-radius: 100px;
   border: 2px solid var(--line);
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
   font-size: 0.78rem;
   font-weight: 800;
   cursor: pointer;
@@ -626,7 +679,7 @@
 }
 .demo-calendar-month-title {
   margin: 0;
-  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-family: var(--font-rounded), sans-serif;
   font-weight: 900;
   font-size: 1.1rem;
   min-width: 8rem;
@@ -762,4 +815,91 @@
   .demo-nav-btn.is-active {
     border-bottom-color: var(--primary);
   }
+}
+
+.demo-email-template-workspace {
+  max-width: 720px;
+}
+
+.demo-email-template-lead {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.demo-email-template-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.demo-email-template-tab {
+  flex: 1 1 calc(50% - 0.25rem);
+  min-width: 7rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 0.65rem 0.75rem;
+  font-family: var(--font-rounded), sans-serif;
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.demo-email-template-tab:hover {
+  background: var(--bg-soft);
+  color: var(--ink);
+}
+
+.demo-email-template-tab.is-active {
+  background: var(--bg-soft);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.demo-email-template-section {
+  margin-top: 0;
+}
+
+.demo-email-template-section-lead {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.demo-email-template-subject {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.65rem;
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #faf8f5;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.demo-email-template-subject-label {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.demo-email-template-preview {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  overflow: auto;
+  box-shadow: 0 4px 16px rgba(42, 33, 25, 0.06);
 }

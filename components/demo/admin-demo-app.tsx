@@ -7,6 +7,7 @@ import { InvoiceFormalDocument } from "@/components/invoice-formal-document"
 import { DemoOrderStatusSelect } from "@/components/demo/demo-order-status-select"
 import { DemoPageShell } from "@/components/demo/demo-page-shell"
 import { DemoOrdersCalendar } from "@/components/demo/demo-orders-calendar"
+import { DemoEmailTemplatePanel } from "@/components/demo/demo-email-template-panel"
 import { DemoSettingsPanel } from "@/components/demo/demo-settings-panel"
 import type { DemoOrderView, DemoUiStatus } from "@/lib/build-demo-view-model"
 import { filterOrdersByDeliveryMonth, sortDemoOrders } from "@/lib/build-demo-view-model"
@@ -24,10 +25,10 @@ type AdminDemoAppProps = {
   backUrl?: string
   initialOrders: DemoOrderView[]
   initialSelectedId?: string
-  initialPanel?: "orders" | "orders-calendar" | "invoices" | "settings"
+  initialPanel?: "orders" | "orders-calendar" | "invoices" | "settings" | "email-template"
 }
 
-type DemoPanel = "orders" | "orders-calendar" | "invoices" | "settings"
+type DemoPanel = "orders" | "orders-calendar" | "invoices" | "settings" | "email-template"
 
 function yen(n: number) {
   return `¥${n.toLocaleString("ja-JP")}`
@@ -234,6 +235,14 @@ export function AdminDemoApp({
           <Link href="/order" className="demo-nav-btn demo-nav-link">
             注文ページ
           </Link>
+          <button
+            type="button"
+            className={`demo-nav-btn${panel === "email-template" ? " is-active" : ""}`}
+            aria-current={panel === "email-template" ? "page" : undefined}
+            onClick={() => setPanel("email-template")}
+          >
+            通知メールテンプレ
+          </button>
         </aside>
 
         <main className="demo-main">
@@ -307,6 +316,7 @@ export function AdminDemoApp({
                         <th>受付</th>
                         <th>顧客</th>
                         <th>お届け日時</th>
+                        <th>決済方法</th>
                         <th>金額</th>
                         <th>状態</th>
                         <th />
@@ -315,7 +325,7 @@ export function AdminDemoApp({
                     <tbody>
                       {sorted.length === 0 ? (
                         <tr>
-                          <td colSpan={6} style={{ color: "var(--muted)" }}>
+                          <td colSpan={7} style={{ color: "var(--muted)" }}>
                             {salesY}年{salesM}月のお届け予定の注文はありません。
                           </td>
                         </tr>
@@ -329,6 +339,7 @@ export function AdminDemoApp({
                             </td>
                             <td>{o.customerName}</td>
                             <td>{o.deliveryLabel}</td>
+                            <td>{o.form.pay || "—"}</td>
                             <td>{yen(o.totalYen)}</td>
                             <td>
                               <DemoOrderStatusSelect
@@ -446,6 +457,17 @@ export function AdminDemoApp({
                 </div>
               ) : null}
             </div>
+          </section>
+
+          <section
+            id="panel-email-template"
+            className={`demo-panel${panel === "email-template" ? " is-active" : ""}`}
+            aria-labelledby="email-template-heading"
+          >
+            <h1 id="email-template-heading" className="demo-panel-title">
+              通知メールテンプレ
+            </h1>
+            <DemoEmailTemplatePanel />
           </section>
 
           <section

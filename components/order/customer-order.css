@@ -182,7 +182,7 @@
 }
 
 .co-card-head {
-  padding: 1rem 1.25rem 0.75rem;
+  padding: 1rem 1.25rem 0.85rem;
   background: linear-gradient(to right, #fffbeb, #fff7ed);
 }
 
@@ -192,6 +192,20 @@
   font-weight: 700;
   line-height: 1.4;
   color: #92400e;
+}
+
+.co-card-description {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.65;
+  color: #78716c;
+}
+
+@media (min-width: 768px) {
+  .co-card-description {
+    font-size: 0.8125rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -498,6 +512,7 @@
 }
 
 .co-field-grid input,
+.co-field-grid select,
 .co-field-grid textarea {
   width: 100%;
   max-width: 100%;
@@ -520,6 +535,7 @@
 }
 
 .co-field-grid input:focus,
+.co-field-grid select:focus,
 .co-field-grid textarea:focus {
   outline: none;
   border-color: var(--co-accent);
@@ -590,4 +606,156 @@
   background: #fef2f2;
   border: 1px solid #fecaca;
   grid-column: 1 / -1;
+}
+
+.co-main--complete {
+  display: flex;
+  justify-content: center;
+  padding-top: 2.5rem;
+}
+
+.co-complete {
+  width: 100%;
+  max-width: 520px;
+  padding: 2rem 1.5rem;
+  border: 1px solid var(--co-accent-border);
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(217, 119, 6, 0.08);
+  text-align: center;
+}
+
+.co-complete-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: 1rem;
+  border-radius: 999px;
+  background: #ecfdf5;
+  border: 2px solid #6ee7b7;
+  color: #047857;
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.co-complete-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--co-ink-body);
+}
+
+.co-complete-lead {
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--co-muted);
+}
+
+.co-complete-summary {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--co-accent-soft);
+  text-align: left;
+}
+
+.co-complete-lines {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--co-ink-body);
+}
+
+.co-complete-empty {
+  margin: 0 0 1rem;
+  font-size: 0.88rem;
+  color: var(--co-muted);
+}
+
+.co-complete-meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  font-size: 0.88rem;
+}
+
+.co-complete-meta dt {
+  margin: 0;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.co-complete-meta dd {
+  margin: 0;
+  color: var(--co-ink-body);
+}
+
+.co-invoice-fields {
+  border-top: 1px solid var(--co-accent-border);
+  background: #fffbeb;
+}
+
+.co-invoice-fields-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #92400e;
+}
+
+.co-payment-notice {
+  border-top: 1px solid var(--co-accent-border);
+  background: #fffbeb;
+}
+
+.co-payment-notice-text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: #92400e;
+}
+
+.co-arrival-handling {
+  padding: 1rem;
+  border: 1px solid var(--co-accent-border);
+  border-radius: 0.5rem;
+  background: #fffbeb;
+}
+
+.co-arrival-handling-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--co-accent-dark);
+}
+
+.co-arrival-handling-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.co-arrival-handling-note {
+  margin: 0.85rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: #92400e;
+}
+
+.co-arrival-handling-other {
+  margin-top: 0.85rem;
+}
+
+.co-emergency-contact {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: var(--co-muted);
 }

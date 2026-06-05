@@ -35,12 +35,16 @@ export function DemoOrderDetailPage({ order, items, brandName, backUrl }: DemoOr
             ← 注文一覧
           </Link>
         </p>
-        <h1 className="demo-panel-title">注文内容</h1>
-        <p className="demo-order-meta">
-          <span>{view.orderNumber}</span>
-          <span className="demo-order-meta-sep">·</span>
-          <span>{view.customerName}</span>
-        </p>
+        <div className="demo-order-detail-head">
+          <div>
+            <h1 className="demo-panel-title">注文詳細</h1>
+            <p className="demo-order-meta">
+              <span>{view.orderNumber}</span>
+              <span className="demo-order-meta-sep">·</span>
+              <span>{view.customerName}</span>
+            </p>
+          </div>
+        </div>
         <div className="admin-workspace">
           <DemoOrderDetail
             view={view}

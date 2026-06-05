@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import type { DemoOrderView, DemoUiStatus } from "@/lib/build-demo-view-model"
 import { DemoOrderStatusSelect } from "@/components/demo/demo-order-status-select"
@@ -8,7 +9,10 @@ import {
   rebuildDemoOrderViewWithDelivery,
   writeDemoOrderDelivery,
 } from "@/lib/demo-order-delivery"
+import { PickupTimeSlotSelect } from "@/components/pickup-time-slot-select"
 import { getDemoUiStatus, writeDemoOrderStatus } from "@/lib/demo-order-status"
+import { needsManualReceipt } from "@/lib/payment-labels"
+import { normalizePickupTimeStart } from "@/lib/pickup-time-slots"
 
 function yen(n: number) {
   return `¥${n.toLocaleString("ja-JP")}`
@@ -25,14 +29,15 @@ export function DemoOrderDetail({ view, onStatusChange, onDeliveryChange, onSave
   const [uiStatus, setUiStatus] = useState<DemoUiStatus>(() => getDemoUiStatus(view.id, view.order.status))
   const override = getDemoDeliveryOverride(view.id)
   const [deliveryDate, setDeliveryDate] = useState(override?.deliveryDate ?? view.form.date)
-  const [deliveryTime, setDeliveryTime] = useState(override?.deliveryTime ?? view.form.time)
+  const initialTime = normalizePickupTimeStart(override?.deliveryTime ?? view.order.delivery_time) ?? ""
+  const [deliveryTime, setDeliveryTime] = useState(initialTime)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     const nextOverride = getDemoDeliveryOverride(view.id)
     setDeliveryDate(nextOverride?.deliveryDate ?? view.form.date)
-    setDeliveryTime(nextOverride?.deliveryTime ?? view.form.time)
-  }, [view.id, view.form.date, view.form.time])
+    setDeliveryTime(normalizePickupTimeStart(nextOverride?.deliveryTime ?? view.order.delivery_time) ?? "")
+  }, [view.id, view.form.date, view.order.delivery_time])
 
   function setStatus(next: DemoUiStatus) {
     setUiStatus(next)
@@ -124,12 +129,16 @@ export function DemoOrderDetail({ view, onStatusChange, onDeliveryChange, onSave
           </div>
           <div className="detail-field detail-field--editable">
             <label htmlFor={`delivery-time-${view.id}`}>お届け時間／受け取り時間</label>
-            <input
-              id={`delivery-time-${view.id}`}
-              type="time"
-              value={deliveryTime}
-              onChange={(e) => setDeliveryTime(e.target.value)}
-            />
+            <div className="detail-field-inline">
+              <PickupTimeSlotSelect
+                id={`delivery-time-${view.id}`}
+                value={deliveryTime}
+                onChange={setDeliveryTime}
+              />
+              <button type="button" className="btn btn-primary btn-compact" onClick={handleSaveDelivery} disabled={saving}>
+                {saving ? "保存中…" : "お届け日時を保存"}
+              </button>
+            </div>
           </div>
           <div className="detail-field" style={{ gridColumn: "1 / -1" }}>
             <label>備考・特別なご要望</label>
@@ -140,15 +149,20 @@ export function DemoOrderDetail({ view, onStatusChange, onDeliveryChange, onSave
             <input type="text" readOnly value={view.form.caseNameAndNumber} />
           </div>
         </div>
-        <div className="row-actions">
-          <button type="button" className="btn btn-primary" onClick={handleSaveDelivery} disabled={saving}>
-            お届け日時を保存
-          </button>
-        </div>
       </div>
 
       <div className="line-items-block">
-        <h4>注文内容</h4>
+        <div className="line-items-block-head">
+          <h4>注文内容</h4>
+          {needsManualReceipt(view.order.payment_method) ? (
+            <Link
+              href={`/admin/orders/${view.id}/receipt-print`}
+              className="btn btn-primary btn-compact demo-receipt-btn"
+            >
+              領収書発行
+            </Link>
+          ) : null}
+        </div>
         <div className="table-wrap">
           <table className="data-table">
             <thead>

@@ -4,10 +4,14 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf .next",
-    "dev": "node ./dev-auto-port.mjs --turbo",
+    "dev": "node ./dev-auto-port.mjs",
+    "dev:fast": "node ./dev-auto-port.mjs --no-clean",
+    "dev:turbo": "node ./dev-auto-port.mjs --turbo",
     "dev:webpack": "node ./dev-auto-port.mjs",
-    "dev:clean": "node ./dev-auto-port.mjs --clean --turbo",
+    "dev:clean": "node ./dev-auto-port.mjs",
+    "dev:clean:turbo": "node ./dev-auto-port.mjs --turbo",
     "build": "next build",
+    "prebuild": "node ./scripts/prebuild.mjs",
     "start": "next start -p 3000",
     "lint": "next lint",
     "postinstall": "node ./scripts/verify-next-swc.mjs"
@@ -16,15 +20,12 @@
     "@next/swc-darwin-arm64": "14.2.33"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.8",
     "html2canvas": "^1.4.1",
     "iron-session": "^8.0.4",
     "jspdf": "^4.2.1",
     "next": "14.2.35",
-    "playwright": "^1.60.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "resend": "^4.0.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

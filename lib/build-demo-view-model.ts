@@ -1,3 +1,4 @@
+import { formatDeliveryDateTime, formatPickupTimeRange, normalizePickupTimeStart } from "@/lib/pickup-time-slots"
 import { getDeliveryContext } from "@/lib/order-delivery-context"
 import { formatPaymentMethod } from "@/lib/payment-labels"
 import { MOCK_ORDER_ITEMS, MOCK_ORDERS } from "@/lib/mock-orders"
@@ -46,13 +47,6 @@ export function statusToUi(status: string): DemoUiStatus {
   return "new"
 }
 
-export function uiStatusToDb(ui: DemoUiStatus): string {
-  if (ui === "new") return "requested"
-  if (ui === "processing") return "confirmed"
-  if (ui === "done") return "delivered"
-  return "cancelled"
-}
-
 function formatReceived(iso: string): string {
   try {
     return new Intl.DateTimeFormat("ja-JP", {
@@ -68,10 +62,7 @@ function formatReceived(iso: string): string {
 }
 
 function formatDelivery(order: OrderRow): string {
-  if (!order.delivery_date?.trim()) return "—"
-  const d = order.delivery_date.trim()
-  const t = order.delivery_time?.trim()
-  return t ? `${d} ${t}` : d
+  return formatDeliveryDateTime(order.delivery_date, order.delivery_time)
 }
 
 function parseDeliveryYm(deliveryDate: string | null): { y: number; mo: number } | null {
@@ -84,7 +75,7 @@ function parseDeliveryYm(deliveryDate: string | null): { y: number; mo: number }
 function deliveryTimestamp(order: OrderRow): number {
   const d = order.delivery_date?.trim()
   if (!d) return Number.MAX_SAFE_INTEGER
-  const t = order.delivery_time?.trim() ?? "00:00"
+  const t = normalizePickupTimeStart(order.delivery_time) ?? "00:00"
   const parsed = Date.parse(`${d}T${t}:00+09:00`)
   return Number.isNaN(parsed) ? Number.MAX_SAFE_INTEGER : parsed
 }
@@ -117,7 +108,7 @@ export function orderToDemoView(order: OrderRow, items: OrderItemRow[]): DemoOrd
       email: order.customer_email,
       address: order.customer_address?.trim() ?? "",
       date: order.delivery_date?.trim() ?? "",
-      time: order.delivery_time?.trim() ?? "",
+      time: formatPickupTimeRange(order.delivery_time) ?? "",
       note: order.notes?.trim() ?? "",
       caseNameAndNumber: order.management_number?.trim() || "—",
     },

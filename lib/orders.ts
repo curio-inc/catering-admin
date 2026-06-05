@@ -1,12 +1,6 @@
-import { isDemoMode } from "@/lib/demo-mode"
 import { MOCK_ORDER_ITEMS, MOCK_ORDERS } from "@/lib/mock-orders"
-import { describeSupabaseEnvGap, getSupabaseAdmin } from "@/lib/supabase-admin"
 
-function useMock(): boolean {
-  return isDemoMode()
-}
-
-/** `public.orders`（管理用カラム含む） */
+/** デモ用 `public.orders` 相当 */
 export type OrderRow = {
   id: string
   order_number?: string
@@ -47,128 +41,11 @@ export type OrderItemRow = {
   sort_order: number
 }
 
-const listSelectWithAdmin = [
-  "id",
-  "created_at",
-  "updated_at",
-  "status",
-  "payment_status",
-  "subtotal_yen",
-  "tax_yen",
-  "total_yen",
-  "payment_method",
-  "payment_method_label",
-  "customer_name",
-  "customer_phone",
-  "delivery_date",
-  "delivery_time",
-  "admin_opened_at",
-  "invoice_issued_at",
-  "invoice_sent_at",
-].join(", ")
-
-const listSelectLegacy = [
-  "id",
-  "created_at",
-  "updated_at",
-  "status",
-  "payment_status",
-  "subtotal_yen",
-  "tax_yen",
-  "total_yen",
-  "payment_method",
-  "payment_method_label",
-  "customer_name",
-  "customer_phone",
-  "delivery_date",
-  "delivery_time",
-].join(", ")
-
-
-function withSupabaseErrorHint(message: string): string {
-  if (/fetch failed|TypeError:\s*fetch failed/i.test(message)) {
-    return `${message} Supabase への通信に失敗しました。ネットワーク接続を確認し、\`npm run dev:clean\` で再起動してください。`
-  }
-  return message
-}
-
-function listQuery(supabase: NonNullable<ReturnType<typeof getSupabaseAdmin>>, select: string) {
-  return supabase.from("orders").select(select).order("delivery_date", { ascending: true, nullsFirst: true }).order("created_at", {
-    ascending: true,
-  })
-}
-
-export async function fetchOrdersList(limit = 200): Promise<{ ok: true; rows: OrderRow[] } | { ok: false; message: string }> {
-  if (useMock()) {
-    return { ok: true, rows: MOCK_ORDERS.slice(0, limit) }
-  }
-
-  const supabase = getSupabaseAdmin()
-  if (!supabase) {
-    const gap = describeSupabaseEnvGap()
-    return { ok: false, message: gap ?? "Supabase に接続できません。" }
-  }
-
-  let { data, error } = await listQuery(supabase, listSelectWithAdmin).limit(limit)
-
-  if (error && /admin_opened_at|invoice_issued_at|invoice_sent_at|column.*does not exist/i.test(error.message)) {
-    ;({ data, error } = await listQuery(supabase, listSelectLegacy).limit(limit))
-  }
-
-  if (error) {
-    const hint =
-      /admin_opened_at|invoice_issued_at|invoice_sent_at|column/i.test(error.message)
-        ? " Supabase の SQL エディタで `supabase/migrations/20260513120000_order_admin_invoice.sql` を実行してください。"
-        : ""
-    return { ok: false, message: withSupabaseErrorHint(`${error.message}${hint}`) }
-  }
-
-  const rows = (data ?? []) as unknown as OrderRow[]
-  return { ok: true, rows }
-}
-
 export async function fetchOrderWithItems(
   id: string,
 ): Promise<{ ok: true; order: OrderRow; items: OrderItemRow[] } | { ok: false; message: string }> {
-  if (useMock()) {
-    const order = MOCK_ORDERS.find((o) => o.id === id)
-    if (!order) return { ok: false, message: "注文が見つかりません。" }
-    const items = MOCK_ORDER_ITEMS[id] ?? []
-    return { ok: true, order, items }
-  }
-
-  const supabase = getSupabaseAdmin()
-  if (!supabase) {
-    const gap = describeSupabaseEnvGap()
-    return { ok: false, message: gap ?? "Supabase に接続できません。" }
-  }
-
-  const { data: order, error: orderErr } = await supabase.from("orders").select("*").eq("id", id).maybeSingle()
-
-  if (orderErr) {
-    const hint =
-      /admin_opened_at|invoice_issued_at|invoice_sent_at|column/i.test(orderErr.message)
-        ? " `supabase/migrations/20260513120000_order_admin_invoice.sql` を Supabase に適用してください。"
-        : ""
-    return { ok: false, message: withSupabaseErrorHint(`${orderErr.message}${hint}`) }
-  }
-  if (!order) {
-    return { ok: false, message: "注文が見つかりません。" }
-  }
-
-  const { data: items, error: itemsErr } = await supabase
-    .from("order_items")
-    .select("id, order_id, menu_name_snapshot, unit_price_yen_snapshot, quantity, custom_text, custom_rows, sort_order")
-    .eq("order_id", id)
-    .order("sort_order", { ascending: true })
-
-  if (itemsErr) {
-    return { ok: false, message: withSupabaseErrorHint(itemsErr.message) }
-  }
-
-  return {
-    ok: true,
-    order: order as unknown as OrderRow,
-    items: (items ?? []) as unknown as OrderItemRow[],
-  }
+  const order = MOCK_ORDERS.find((o) => o.id === id)
+  if (!order) return { ok: false, message: "注文が見つかりません。" }
+  const items = MOCK_ORDER_ITEMS[id] ?? []
+  return { ok: true, order, items }
 }

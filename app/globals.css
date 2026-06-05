@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --font-rounded: "M PLUS Rounded 1c", sans-serif;
+}
+
 body {
   @apply bg-stone-50 text-stone-900 antialiased;
 }
@@ -25,6 +29,9 @@ body {
     box-shadow: none !important;
   }
   .invoice-formal {
+    box-shadow: none !important;
+  }
+  .receipt-formal {
     box-shadow: none !important;
   }
 
@@ -302,4 +309,178 @@ body {
   .invoice-formal-footer {
     break-inside: avoid;
   }
+
+  .receipt-formal-one-page {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    page-break-inside: avoid;
+  }
+}
+
+/* 領収書: A4 1枚（PDF サンプル準拠） */
+.receipt-formal-one-page {
+  box-sizing: border-box;
+  position: relative;
+  width: 210mm;
+  max-width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 16mm 18mm 18mm;
+  color: #000;
+  font-size: 11pt;
+  line-height: 1.45;
+  background: #fff;
+}
+
+.receipt-formal-meta {
+  position: absolute;
+  top: 16mm;
+  right: 18mm;
+  text-align: right;
+}
+
+.receipt-formal-date,
+.receipt-formal-number {
+  margin: 0;
+  font-size: 11pt;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.receipt-formal-number {
+  margin-top: 2px;
+}
+
+.receipt-formal-title {
+  margin: 8mm 0 0;
+  padding-top: 10mm;
+  font-size: 26pt;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.receipt-formal-recipient {
+  margin: 14mm 0 0;
+  padding: 0;
+  font-size: 11pt;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.receipt-formal-recipient span {
+  display: inline-block;
+  min-width: 58%;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #000;
+}
+
+.receipt-formal-total-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 68%;
+  max-width: 128mm;
+  margin: 10mm auto 0;
+  padding: 4.5mm 6mm;
+  border: 1px solid #000;
+  box-sizing: border-box;
+}
+
+.receipt-formal-total-label {
+  font-size: 11pt;
+  font-weight: 400;
+}
+
+.receipt-formal-total-value {
+  font-size: 22pt;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.receipt-formal-body {
+  margin: 10mm 0 0;
+  padding: 0;
+}
+
+.receipt-formal-tadashi {
+  margin: 0 0 3mm;
+  font-size: 11pt;
+  font-weight: 400;
+}
+
+.receipt-formal-ack {
+  margin: 0;
+  font-size: 11pt;
+  font-weight: 400;
+}
+
+.receipt-formal-rule {
+  width: 58%;
+  margin: 8mm 0 0;
+  border: 0;
+  border-top: 1px solid #000;
+}
+
+.receipt-formal-footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10mm;
+  margin-top: 8mm;
+  padding: 0;
+}
+
+.receipt-formal-tax-col {
+  flex: 0 0 36%;
+  max-width: 68mm;
+}
+
+.receipt-formal-tax-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8mm;
+  margin: 0;
+  font-size: 11pt;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.65;
+}
+
+.receipt-formal-tax-label {
+  flex: 0 0 auto;
+  font-weight: 400;
+}
+
+.receipt-formal-tax-value {
+  flex: 1 1 auto;
+  text-align: right;
+  font-weight: 400;
+}
+
+.receipt-formal-tax-rule {
+  margin: 3mm 0;
+  border: 0;
+  border-top: 1px solid #000;
+}
+
+.receipt-formal-issuer {
+  flex: 0 1 44%;
+  margin-top: 1mm;
+  font-size: 11pt;
+  font-weight: 400;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.receipt-formal-issuer p {
+  margin: 0 0 2px;
+}
+
+.receipt-formal-issuer-address {
+  margin-top: 2px !important;
+  white-space: pre-wrap;
 }

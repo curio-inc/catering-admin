@@ -1,3 +1,8 @@
+import {
+  doesPickupSlotOverlapStopBand,
+  normalizePickupTimeStart,
+} from "@/lib/pickup-time-slots"
+
 export type ReceptionStopEntry = {
   id: string
   stopDate: string
@@ -42,32 +47,6 @@ export function parseReceptionStopsJson(raw: string | null): ReceptionStopEntry[
   }
 }
 
-function parseTimeToMinutes(value: string): number | null {
-  const m = /^(\d{1,2}):(\d{2})$/.exec(value.trim())
-  if (!m) return null
-  const hours = Number(m[1])
-  const minutes = Number(m[2])
-  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null
-  return hours * 60 + minutes
-}
-
-/** 受付時間が停止帯に含まれるか（開始・終了のいずれか欠けている場合はその側のみ判定） */
-function isTimeWithinStopBand(pickupTime: string, timeStart: string, timeEnd: string): boolean {
-  const pickup = parseTimeToMinutes(pickupTime)
-  if (pickup == null) return false
-
-  const start = timeStart ? parseTimeToMinutes(timeStart) : null
-  const end = timeEnd ? parseTimeToMinutes(timeEnd) : null
-
-  if (start != null && end != null) {
-    if (start <= end) return pickup >= start && pickup <= end
-    return pickup >= start || pickup <= end
-  }
-  if (start != null) return pickup >= start
-  if (end != null) return pickup <= end
-  return false
-}
-
 export type ReceptionStopBlock = { blocked: true; label: string } | { blocked: false }
 
 /** 選択した受取日・時間が受付停止に該当するか */
@@ -89,10 +68,10 @@ export function findReceptionStopBlock(
       return { blocked: true, label: formatReceptionStopLabel(entry) }
     }
 
-    const pickupTime = time.trim()
-    if (!pickupTime) continue
+    const slotStart = normalizePickupTimeStart(time)
+    if (!slotStart) continue
 
-    if (isTimeWithinStopBand(pickupTime, timeStart, timeEnd)) {
+    if (doesPickupSlotOverlapStopBand(slotStart, timeStart, timeEnd)) {
       return { blocked: true, label: formatReceptionStopLabel(entry) }
     }
   }

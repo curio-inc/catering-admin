@@ -1,6 +1,6 @@
 import type { OrderItemRow, OrderRow } from "@/lib/orders"
 
-/** USE_MOCK_DATA=true のときのみ使用するデモ用サンプルデータ（架空の会社・顧客） */
+/** デモ用サンプルデータ（架空の会社・顧客） */
 
 export const MOCK_ORDERS: OrderRow[] = [
   {

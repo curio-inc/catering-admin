@@ -13,7 +13,6 @@ export type AppBrand = {
   /** 注文番号の接頭辞（例: DM-202605-001） */
   orderNumberPrefix: string
   contactEmail: string
-  resendFromFallback: string
 }
 
 export function getAppBrand(): AppBrand {
@@ -23,6 +22,5 @@ export function getAppBrand(): AppBrand {
     legalCompanyName,
     orderNumberPrefix: env("ORDER_NUMBER_PREFIX", "DM-"),
     contactEmail: env("INVOICE_ISSUER_EMAIL", "demo@example.com"),
-    resendFromFallback: env("RESEND_FROM", "order@demo-catering.example"),
   }
 }

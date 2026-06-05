@@ -1,34 +1,40 @@
 import { Fragment } from "react"
+import { getInvoiceIssuer } from "@/lib/invoice-issuer"
 import { getDeliveryContext } from "@/lib/order-delivery-context"
 import { formatPickupTimeRange } from "@/lib/pickup-time-slots"
 import type { OrderItemRow, OrderRow } from "@/lib/orders"
 
-type StoreOrderEmailBodyProps = {
+type CustomerOrderEmailBodyProps = {
   order: OrderRow
   items: OrderItemRow[]
-  /** 既定は「注文番号: ...」。印刷用ページでは「請求書」などに差し替え可能 */
-  mainTitle?: string
 }
 
-/** 店舗向けメール（send-order-email の storeEmailHtml）と同じ情報・並び（HTML＋Tailwind） */
-export function StoreOrderEmailBody({ order, items, mainTitle }: StoreOrderEmailBodyProps) {
+/** お客様向けメール（send-order-email の customerEmailHtml）と同じ情報・並び（HTML＋Tailwind） */
+export function CustomerOrderEmailBody({ order, items }: CustomerOrderEmailBodyProps) {
+  const issuer = getInvoiceIssuer()
   const { hasAddress, receivingText, deliveryFeeYen, deliveryFeeNote } = getDeliveryContext(order)
 
   const paymentText = paymentTextLikeStoreEmail(order)
-  const title = mainTitle ?? `注文番号: ${order.order_number?.trim() || order.id}`
-
-  const caseLine = order.management_number?.trim() || ""
   const deliveryDateLabel = hasAddress ? "お届け日" : "受取日"
   const deliveryTimeLabel = hasAddress ? "お届け時間" : "受け取り時間"
   const timeRange = formatPickupTimeRange(order.delivery_time)
 
   return (
     <div
-      className="store-order-email-view mx-auto max-w-[600px] px-5 py-5 text-[#333] print:px-4 print:py-4"
+      className="customer-order-email-view mx-auto max-w-[600px] px-5 py-5 text-[#333] print:px-4 print:py-4"
       style={{ fontFamily: "'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, sans-serif", lineHeight: 1.6 }}
     >
-      <div className="mb-6 print:mb-5">
-        <h2 className="m-0 text-xl font-semibold leading-snug text-[#d97706] print:text-[22px]">{title}</h2>
+      <div className="mb-6 rounded-[10px] bg-gradient-to-br from-[#f59e0b] to-[#d97706] px-5 py-5 text-center text-white print:mb-5">
+        <p className="customer-order-email-logo m-0 text-[28px] font-bold leading-tight">ロゴ</p>
+      </div>
+
+      <div className="mb-5 rounded-lg bg-[#f8fafc] p-5 print:mb-4">
+        <h2 className="mt-0 text-xl font-semibold text-[#d97706]">ご注文ありがとうございます</h2>
+        <p className="mb-0">
+          この度は、【店舗名】をご利用いただき、誠にありがとうございます。
+          <br />
+          以下の内容でご注文を承りました。2~3営業日以内に担当者よりご連絡させていただきます。
+        </p>
       </div>
 
       <div className="mb-8 print:mb-6">
@@ -47,7 +53,7 @@ export function StoreOrderEmailBody({ order, items, mainTitle }: StoreOrderEmail
             <strong>メールアドレス:</strong> {order.customer_email}
           </p>
           <p>
-            <strong>案件名・案件番号:</strong> {caseLine}
+            <strong>案件名・案件番号:</strong> {order.management_number?.trim() || ""}
           </p>
         </div>
       </div>
@@ -154,17 +160,29 @@ export function StoreOrderEmailBody({ order, items, mainTitle }: StoreOrderEmail
           </div>
         </div>
       ) : null}
+
+      <div className="mt-8 rounded-lg bg-[#f8fafc] p-5 text-center print:mt-6">
+        <h3 className="m-0 text-base font-semibold text-[#d97706]">お問い合わせ</h3>
+        <p className="mb-0 mt-2 text-sm leading-relaxed">
+          <strong>{issuer.companyName}</strong>
+          <br />
+          {issuer.postalCode} {issuer.addressLines.replace(/\n/g, " ")}
+          <br />
+          TEL: {issuer.tel}
+          <br />
+          Email: {issuer.email}
+        </p>
+      </div>
     </div>
   )
 }
 
-/** 店舗向けメールの `paymentText` と同じ（支払い方法の行） */
 function paymentTextLikeStoreEmail(order: OrderRow): string {
   const m = order.payment_method?.toLowerCase() ?? ""
   if (m === "invoice") return "請求書払い"
-  if (m === "credit" || m === "card") return "クレジットカード"
+  if (m === "credit" || m === "card" || m === "credit_card") return "クレジットカード"
   if (m === "cash") return "現金払い（領収書必要）"
-  return order.payment_method || ""
+  return order.payment_method_label?.trim() || order.payment_method || ""
 }
 
 function CustomRowsBlock({ line }: { line: OrderItemRow }) {

@@ -7,3 +7,13 @@ export function formatPaymentMethod(paymentMethod: string, paymentMethodLabel: s
   if (m === "cash") return "現金払い"
   return paymentMethod || "—"
 }
+
+export function isCreditCardPayment(paymentMethod: string): boolean {
+  const m = paymentMethod?.toLowerCase() ?? ""
+  return m === "credit" || m === "card" || m === "credit_card"
+}
+
+/** 手動での領収書発行が必要か（クレカは Stripe 自動送付のため不要） */
+export function needsManualReceipt(paymentMethod: string): boolean {
+  return !isCreditCardPayment(paymentMethod)
+}
