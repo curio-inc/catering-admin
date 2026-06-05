@@ -1,8 +1,4 @@
 {
-  "installCommand": "npm install",
-  "buildCommand": "npm run build",
-  "env": {
-    "USE_MOCK_DATA": "true",
-    "NEXT_PUBLIC_APP_BRAND_NAME": "サンプル"
-  }
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm run build"
 }

@@ -3,6 +3,8 @@ import { getAppBrand } from "@/lib/app-brand"
 import { isDemoMode } from "@/lib/demo-mode"
 import { notFound } from "next/navigation"
 
+export const dynamic = "force-dynamic"
+
 export const metadata = {
   title: "オンライン注文",
 }
