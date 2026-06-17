@@ -184,8 +184,8 @@ catering-admin/
    | `catering-admin-demo-invoice-sent` | 請求書送信済みフラグ |
    | `catering-admin-reception-stops` | 受付停止設定 |
 
-3. 「自動送信」「注文送信」などのメール送信・決済は**実行されない**（UI 上の演出のみ）。
-4. 認証は単一パスワードのみ。ユーザー個別アカウント・権限管理は未実装。
+3. 「自動送信」「注文送信」などのメール送信・決済は**実行されない**（UI 上の演出のみ）。クレジットカード決済（Stripe）は**採用可否が未定**。
+4. 認証は**単一パスワード方式で確定**。ユーザー個別アカウント・ロール管理は要件外。
 
 ---
 
@@ -212,9 +212,8 @@ catering-admin/
 | テーマ | 着手の起点 | 内容 |
 | --- | --- | --- |
 | データ永続化 | `lib/orders.ts` / `lib/mock-orders.ts` / `lib/demo-*.ts` | モック & `localStorage` を実 DB（例: Supabase / PostgreSQL）に置き換え。`fetchOrderWithItems` 等のインターフェースは維持しやすい構成 |
-| 認証・権限 | `middleware.ts` / `lib/session.ts` / `app/admin/login/` | 単一パスワードから、複数スタッフアカウント・ロール管理へ |
 | メール送信 | `components/*-email-body.tsx` / `lib/order-email-subjects.ts` | 本文テンプレは実装済み。配信基盤（送信処理）との接続が必要 |
-| 決済 | `lib/payment-labels.ts`（`needsManualReceipt` 等） | クレジットカード決済（Stripe）と領収書自動配信 |
+| 決済（**未定**） | `lib/payment-labels.ts`（`needsManualReceipt` 等） | クレジットカード決済（Stripe）の採用可否が未確定。導入時に決済処理と領収書自動配信を実装 |
 | 顧客注文の確定 | `components/order/customer-order-page.tsx` | 送信時のサーバー保存・受付枠/在庫の整合制御 |
 
 ### コーディング規約・補足
