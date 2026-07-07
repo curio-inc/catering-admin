@@ -7,5 +7,7 @@ export const metadata = {
 }
 
 export default function PublicOrderPage() {
-  return <CustomerOrderPage />
+  const memberSignupUrl = process.env.NEXT_PUBLIC_MEMBER_SIGNUP_URL?.trim() || undefined
+
+  return <CustomerOrderPage memberSignupUrl={memberSignupUrl} />
 }

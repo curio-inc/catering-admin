@@ -78,6 +78,47 @@
   font-size: 0.95rem;
 }
 
+.co-member-signup {
+  padding: 0.85rem 0.95rem;
+  border-radius: 10px;
+  background: var(--co-accent-soft);
+  border: 1px solid var(--co-accent-border);
+}
+
+.co-member-signup-text {
+  margin: 0 0 0.65rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--co-ink-body);
+}
+
+.co-member-signup-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: var(--co-accent);
+  border: 1px solid var(--co-accent);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.co-member-signup-btn:hover {
+  background: var(--co-accent-dark);
+  border-color: var(--co-accent-dark);
+  color: #fff;
+}
+
+.co-member-signup-note {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--co-muted);
+}
+
 .co-layout {
   display: grid;
   grid-template-columns: 1fr;
@@ -606,6 +647,13 @@
   background: #fef2f2;
   border: 1px solid #fecaca;
   grid-column: 1 / -1;
+}
+
+.co-reception-stop-msg--under-date {
+  margin-top: 0.45rem;
+  grid-column: auto;
+  font-size: 0.75rem;
+  padding: 0.5rem 0.65rem;
 }
 
 .co-main--complete {

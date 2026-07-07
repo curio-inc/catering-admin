@@ -1,7 +1,10 @@
-/** 受け取り・お届け時間枠（30分単位） */
+/** 受け取り・お届け時間枠（30分単位・4:30～17:00） */
 
 export const PICKUP_SLOT_MINUTES = 30
-const SLOTS_PER_DAY = (24 * 60) / PICKUP_SLOT_MINUTES
+/** 選択可能な最初の枠（4:30） */
+const PICKUP_RANGE_START_MINUTES = 4 * 60 + 30
+/** 選択可能な最後の枠の開始時刻（16:30～17:00） */
+const PICKUP_RANGE_END_START_MINUTES = 16 * 60 + 30
 
 export type PickupTimeSlot = {
   /** 保存用 HH:MM（24時間・0埋め） */
@@ -68,9 +71,13 @@ function buildSlot(startMin: number): PickupTimeSlot {
   return { start, end, label }
 }
 
-export const PICKUP_TIME_SLOTS: PickupTimeSlot[] = Array.from({ length: SLOTS_PER_DAY }, (_, i) =>
-  buildSlot(i * PICKUP_SLOT_MINUTES),
-)
+export const PICKUP_TIME_SLOTS: PickupTimeSlot[] = (() => {
+  const slots: PickupTimeSlot[] = []
+  for (let m = PICKUP_RANGE_START_MINUTES; m <= PICKUP_RANGE_END_START_MINUTES; m += PICKUP_SLOT_MINUTES) {
+    slots.push(buildSlot(m))
+  }
+  return slots
+})()
 
 export function formatDeliveryDateTime(
   date: string | null | undefined,

@@ -9,7 +9,11 @@ import {
   RECEPTION_STOPS_STORAGE_KEY,
   type ReceptionStopEntry,
 } from "@/lib/reception-stop"
-import { todayIsoDateInTokyo } from "@/lib/date-tokyo"
+import {
+  isDeliveryDateOrderable,
+  minDeliveryDateIsoInTokyo,
+  ORDER_DEADLINE_DESCRIPTION,
+} from "@/lib/order-deadline"
 import { PickupTimeSlotSelect } from "@/components/pickup-time-slot-select"
 import { formatPickupTimeRange } from "@/lib/pickup-time-slots"
 import { IconCart, IconCreditCard, IconFileText, IconStore, IconTruck } from "@/components/order/order-sidebar-icons"
@@ -68,7 +72,7 @@ function MenuProductCard({
   )
 }
 
-export function CustomerOrderPage() {
+export function CustomerOrderPage({ memberSignupUrl }: { memberSignupUrl?: string }) {
   const [qty, setQty] = useState<Quantities>({})
   const [receiving, setReceiving] = useState<"pickup" | "delivery">("delivery")
   const [companyName, setCompanyName] = useState("")
@@ -115,6 +119,17 @@ export function CustomerOrderPage() {
     [pickupDate, pickupTime, receptionStops],
   )
 
+  const orderDeadlineBlock = useMemo(() => {
+    if (!pickupDate) return { blocked: false, label: "" }
+    if (!isDeliveryDateOrderable(pickupDate)) {
+      return { blocked: true, label: ORDER_DEADLINE_DESCRIPTION }
+    }
+    return { blocked: false, label: "" }
+  }, [pickupDate])
+
+  const dateTimeBlocked = receptionBlock.blocked || orderDeadlineBlock.blocked
+  const minPickupDate = minDeliveryDateIsoInTokyo()
+
   const lines = useMemo(() => {
     const result: { item: MockMenuItem; quantity: number; subtotal: number }[] = []
     for (const cat of MOCK_ORDER_MENU) {
@@ -145,6 +160,7 @@ export function CustomerOrderPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (dateTimeBlocked) return
     setSubmitted(true)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -388,6 +404,23 @@ export function CustomerOrderPage() {
                   <h2 className="co-panel-title">お客様情報</h2>
                 </div>
                 <div className="co-panel-section co-panel-section--fields">
+                  <div className="co-member-signup">
+                    <p className="co-member-signup-text">
+                      はじめてご注文の方は、事前の会員登録をお願いいたします。登録後、お客様情報の入力がスムーズになります。
+                    </p>
+                    {memberSignupUrl ? (
+                      <a
+                        href={memberSignupUrl}
+                        className="co-member-signup-btn"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        会員登録はこちら
+                      </a>
+                    ) : (
+                      <p className="co-member-signup-note">会員登録ページのURLは管理者が設定します。</p>
+                    )}
+                  </div>
                   <label className="co-field-grid" htmlFor="co-company">
                     会社名
                     <input
@@ -494,27 +527,37 @@ export function CustomerOrderPage() {
                   ) : null}
                   <div className="co-field-row">
                     <label className="co-field-grid" htmlFor="co-date">
-                      受取日 *
+                      {receiving === "delivery" ? "お届け日 *" : "受取日 *"}
                       <input
                         id="co-date"
                         type="date"
                         required
-                        min={todayIsoDateInTokyo()}
+                        min={minPickupDate}
                         value={pickupDate}
-                        aria-invalid={receptionBlock.blocked}
+                        aria-invalid={dateTimeBlocked}
                         onChange={(e) => setPickupDate(e.target.value)}
                       />
+                      <span className="co-field-hint-block">※ご注文は{ORDER_DEADLINE_DESCRIPTION}にお願いいたします。</span>
+                      {orderDeadlineBlock.blocked ? (
+                        <p className="co-reception-stop-msg co-reception-stop-msg--under-date" role="alert">
+                          ご注文の締切（{orderDeadlineBlock.label}）を過ぎているため、このお届け日は選択できません。
+                        </p>
+                      ) : null}
+                      {receptionBlock.blocked ? (
+                        <p className="co-reception-stop-msg co-reception-stop-msg--under-date" role="alert">
+                          選択された日時は受付停止のためご注文いただけません（{receptionBlock.label}）。
+                        </p>
+                      ) : null}
                     </label>
                     <label className="co-field-grid" htmlFor="co-time">
-                      受け取り時間 *
+                      {receiving === "delivery" ? "お届け時間 *" : "受け取り時間 *"}
                       <PickupTimeSlotSelect
                         id="co-time"
                         required
                         value={pickupTime}
-                        aria-invalid={receptionBlock.blocked}
+                        aria-invalid={dateTimeBlocked}
                         onChange={setPickupTime}
                       />
-                      <span className="co-field-hint-block">30分枠から選択（例: 5:00～5:30）</span>
                     </label>
                   </div>
                   <label className="co-field-grid" htmlFor="co-day-contact">
@@ -537,11 +580,6 @@ export function CustomerOrderPage() {
                       onChange={(e) => setDayContactPhone(e.target.value)}
                     />
                   </label>
-                  {receptionBlock.blocked ? (
-                    <p className="co-reception-stop-msg" role="alert">
-                      選択された日時は受付停止のためご注文いただけません（{receptionBlock.label}）。
-                    </p>
-                  ) : null}
                   <label className="co-field-grid" htmlFor="co-notes">
                     備考・特別なご要望
                     <textarea

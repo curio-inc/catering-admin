@@ -20,7 +20,9 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
         ? "settings"
         : panelParam === "email-template"
           ? "email-template"
-          : panelParam === "orders-calendar"
+          : panelParam === "customers"
+            ? "customers"
+            : panelParam === "orders-calendar"
             ? "orders-calendar"
             : "orders"
   const invoiceOrderId = panelParam === "invoices" ? searchParams.order?.trim() : undefined

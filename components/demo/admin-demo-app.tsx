@@ -7,6 +7,7 @@ import { InvoiceFormalDocument } from "@/components/invoice-formal-document"
 import { DemoOrderStatusSelect } from "@/components/demo/demo-order-status-select"
 import { DemoPageShell } from "@/components/demo/demo-page-shell"
 import { DemoOrdersCalendar } from "@/components/demo/demo-orders-calendar"
+import { DemoCustomersPanel } from "@/components/demo/demo-customers-panel"
 import { DemoEmailTemplatePanel } from "@/components/demo/demo-email-template-panel"
 import { DemoSettingsPanel } from "@/components/demo/demo-settings-panel"
 import type { DemoOrderView, DemoUiStatus } from "@/lib/build-demo-view-model"
@@ -14,6 +15,7 @@ import { filterOrdersByDeliveryMonth, sortDemoOrders } from "@/lib/build-demo-vi
 import { isDemoInvoiceSent, markDemoInvoiceSent, readDemoInvoiceSent } from "@/lib/demo-invoice-sent"
 import { applyDemoDeliveries } from "@/lib/demo-order-delivery"
 import { applyDemoStatuses, writeDemoOrderStatus } from "@/lib/demo-order-status"
+import { downloadOrdersCsv } from "@/lib/export-orders-csv"
 import {
   buildInvoicePdfDownloadName,
   downloadInvoicePdfFromElement,
@@ -25,10 +27,10 @@ type AdminDemoAppProps = {
   backUrl?: string
   initialOrders: DemoOrderView[]
   initialSelectedId?: string
-  initialPanel?: "orders" | "orders-calendar" | "invoices" | "settings" | "email-template"
+  initialPanel?: "orders" | "orders-calendar" | "invoices" | "customers" | "settings" | "email-template"
 }
 
-type DemoPanel = "orders" | "orders-calendar" | "invoices" | "settings" | "email-template"
+type DemoPanel = "orders" | "orders-calendar" | "invoices" | "customers" | "settings" | "email-template"
 
 function yen(n: number) {
   return `¥${n.toLocaleString("ja-JP")}`
@@ -227,6 +229,14 @@ export function AdminDemoApp({
           </button>
           <button
             type="button"
+            className={`demo-nav-btn${panel === "customers" ? " is-active" : ""}`}
+            aria-current={panel === "customers" ? "page" : undefined}
+            onClick={() => setPanel("customers")}
+          >
+            顧客管理
+          </button>
+          <button
+            type="button"
             className={`demo-nav-btn${panel === "settings" ? " is-active" : ""}`}
             onClick={() => setPanel("settings")}
           >
@@ -308,18 +318,29 @@ export function AdminDemoApp({
                   >
                     お届け日順
                   </button>
+                  <button
+                    type="button"
+                    className="btn btn-compact order-csv-export-btn"
+                    disabled={sorted.length === 0}
+                    onClick={() => {
+                      downloadOrdersCsv(sorted, salesY, salesM)
+                      showToast("CSVをダウンロードしました")
+                    }}
+                  >
+                    CSV出力
+                  </button>
                 </div>
                 <div className="table-wrap">
                   <table className="data-table">
                     <thead>
                       <tr>
-                        <th>受付</th>
-                        <th>顧客</th>
                         <th>お届け日時</th>
+                        <th>顧客</th>
                         <th>決済方法</th>
                         <th>金額</th>
                         <th>状態</th>
                         <th />
+                        <th>受付日</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -332,13 +353,8 @@ export function AdminDemoApp({
                       ) : (
                         sorted.map((o) => (
                           <tr key={o.id}>
-                            <td>
-                              {o.receivedLabel}
-                              <br />
-                              <small style={{ color: "var(--muted)" }}>{o.orderNumber}</small>
-                            </td>
-                            <td>{o.customerName}</td>
                             <td>{o.deliveryLabel}</td>
+                            <td>{o.customerName}</td>
                             <td>{o.form.pay || "—"}</td>
                             <td>{yen(o.totalYen)}</td>
                             <td>
@@ -352,6 +368,11 @@ export function AdminDemoApp({
                               <Link href={`/admin/orders/${o.id}`} className="demo-open-link">
                                 開く
                               </Link>
+                            </td>
+                            <td>
+                              {o.receivedLabel}
+                              <br />
+                              <small style={{ color: "var(--muted)" }}>{o.orderNumber}</small>
                             </td>
                           </tr>
                         ))
@@ -460,6 +481,17 @@ export function AdminDemoApp({
           </section>
 
           <section
+            id="panel-customers"
+            className={`demo-panel${panel === "customers" ? " is-active" : ""}`}
+            aria-labelledby="customers-heading"
+          >
+            <h1 id="customers-heading" className="demo-panel-title">
+              顧客管理
+            </h1>
+            <DemoCustomersPanel orders={orders} onOrderStatusChange={updateOrderStatus} />
+          </section>
+
+          <section
             id="panel-email-template"
             className={`demo-panel${panel === "email-template" ? " is-active" : ""}`}
             aria-labelledby="email-template-heading"
@@ -478,7 +510,7 @@ export function AdminDemoApp({
             <h1 id="settings-heading" className="demo-panel-title">
               設定
             </h1>
-            <DemoSettingsPanel onSaved={() => showToast("設定を保存しました")} />
+            <DemoSettingsPanel onSaved={(msg) => showToast(msg ?? "設定を保存しました")} />
           </section>
         </main>
       </div>
