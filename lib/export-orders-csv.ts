@@ -25,7 +25,7 @@ function formatReceivedForCsv(iso: string): string {
   }
 }
 
-function orderToCsvRows(order: DemoOrderView): string[][] {
+function orderToCsvRows(order: DemoOrderView): (string | number)[][] {
   const orderNumber = order.orderNumber
   const receivedAt = formatReceivedForCsv(order.order.created_at)
   const taxYen = order.order.tax_yen

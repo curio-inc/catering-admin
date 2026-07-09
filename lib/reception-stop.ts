@@ -34,7 +34,7 @@ export function parseReceptionStopsJson(raw: string | null): ReceptionStopEntry[
     const data = JSON.parse(raw) as unknown
     if (!Array.isArray(data)) return []
     return data
-      .map((row) => {
+      .map((row): ReceptionStopEntry | null => {
         if (!row || typeof row !== "object") return null
         const r = row as Record<string, unknown>
         const id = typeof r.id === "string" ? r.id : crypto.randomUUID()
