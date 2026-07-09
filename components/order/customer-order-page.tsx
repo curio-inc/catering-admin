@@ -17,6 +17,7 @@ import {
 import { PickupTimeSlotSelect } from "@/components/pickup-time-slot-select"
 import { formatPickupTimeRange } from "@/lib/pickup-time-slots"
 import { IconCart, IconCreditCard, IconFileText, IconStore, IconTruck } from "@/components/order/order-sidebar-icons"
+import { clearDemoMemberSession, readDemoMemberSession } from "@/lib/demo-member-session"
 import "./customer-order.css"
 
 const TAX_RATE = 0.08
@@ -72,7 +73,7 @@ function MenuProductCard({
   )
 }
 
-export function CustomerOrderPage({ memberSignupUrl }: { memberSignupUrl?: string }) {
+export function CustomerOrderPage({ memberSignupUrl = "/order/signup" }: { memberSignupUrl?: string }) {
   const [qty, setQty] = useState<Quantities>({})
   const [receiving, setReceiving] = useState<"pickup" | "delivery">("delivery")
   const [companyName, setCompanyName] = useState("")
@@ -97,6 +98,17 @@ export function CustomerOrderPage({ memberSignupUrl }: { memberSignupUrl?: strin
   const [payment, setPayment] = useState<"card" | "invoice" | "cash">("card")
   const [submitted, setSubmitted] = useState(false)
   const [receptionStops, setReceptionStops] = useState<ReceptionStopEntry[]>([])
+  const [memberEmail, setMemberEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    const session = readDemoMemberSession()
+    if (session) {
+      setMemberEmail(session.email)
+      setEmail(session.email)
+      if (session.name) setName(session.name)
+      if (session.companyName) setCompanyName(session.companyName)
+    }
+  }, [])
 
   useEffect(() => {
     const load = () => {
@@ -405,20 +417,47 @@ export function CustomerOrderPage({ memberSignupUrl }: { memberSignupUrl?: strin
                 </div>
                 <div className="co-panel-section co-panel-section--fields">
                   <div className="co-member-signup">
-                    <p className="co-member-signup-text">
-                      はじめてご注文の方は、事前の会員登録をお願いいたします。登録後、お客様情報の入力がスムーズになります。
-                    </p>
-                    {memberSignupUrl ? (
-                      <a
-                        href={memberSignupUrl}
-                        className="co-member-signup-btn"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        会員登録はこちら
-                      </a>
+                    {memberEmail ? (
+                      <>
+                        <p className="co-member-signup-text">
+                          <strong>{memberEmail}</strong> でログイン中です。お客様情報が自動入力されています。
+                        </p>
+                        <button
+                          type="button"
+                          className="co-member-signup-btn co-member-signup-btn--outline"
+                          onClick={() => {
+                            clearDemoMemberSession()
+                            setMemberEmail(null)
+                          }}
+                        >
+                          ログアウト
+                        </button>
+                      </>
                     ) : (
-                      <p className="co-member-signup-note">会員登録ページのURLは管理者が設定します。</p>
+                      <>
+                        <p className="co-member-signup-text">
+                          はじめてご注文の方は会員登録、登録済みの方はログインしてください。ログイン後、お客様情報の入力がスムーズになります。
+                        </p>
+                        <div className="co-member-auth-actions">
+                          <Link href="/order/login" className="co-member-signup-btn co-member-signup-btn--outline">
+                            ログイン
+                          </Link>
+                          {memberSignupUrl?.startsWith("http") ? (
+                            <a
+                              href={memberSignupUrl}
+                              className="co-member-signup-btn"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              会員登録
+                            </a>
+                          ) : (
+                            <Link href={memberSignupUrl || "/order/signup"} className="co-member-signup-btn">
+                              会員登録
+                            </Link>
+                          )}
+                        </div>
+                      </>
                     )}
                   </div>
                   <label className="co-field-grid" htmlFor="co-company">

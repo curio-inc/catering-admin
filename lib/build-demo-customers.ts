@@ -1,4 +1,5 @@
 import type { DemoOrderView } from "@/lib/build-demo-view-model"
+import { buildDemoOrdersForClient } from "@/lib/build-demo-view-model"
 import { MOCK_CUSTOMERS, type RegisteredCustomer } from "@/lib/mock-customers"
 
 export type DemoCustomerView = {
@@ -6,6 +7,8 @@ export type DemoCustomerView = {
   companyName: string | null
   name: string
   email: string
+  phone: string
+  address: string
   registeredLabel: string
   orders: DemoOrderView[]
 }
@@ -46,14 +49,26 @@ function toCustomerView(customer: RegisteredCustomer, orders: DemoOrderView[]): 
     return b.id.localeCompare(a.id)
   })
 
+  const latest = sortedOrders[0]
+  const phone = latest?.form.phone?.trim() || ""
+  const address =
+    sortedOrders.map((o) => o.form.address.trim()).find((a) => a.length > 0) ?? ""
+
   return {
     id: customer.id,
     companyName: customer.company_name?.trim() || null,
     name: customer.name,
     email: customer.email,
+    phone,
+    address,
     registeredLabel: formatRegisteredAt(customer.registered_at),
     orders: sortedOrders,
   }
+}
+
+export function getDemoCustomerById(id: string): DemoCustomerView | null {
+  const customers = buildDemoCustomersForClient(buildDemoOrdersForClient())
+  return customers.find((c) => c.id === id) ?? null
 }
 
 export function filterDemoCustomers(customers: DemoCustomerView[], query: string): DemoCustomerView[] {

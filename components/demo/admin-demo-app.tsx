@@ -488,7 +488,7 @@ export function AdminDemoApp({
             <h1 id="customers-heading" className="demo-panel-title">
               顧客管理
             </h1>
-            <DemoCustomersPanel orders={orders} onOrderStatusChange={updateOrderStatus} />
+            <DemoCustomersPanel orders={orders} />
           </section>
 
           <section

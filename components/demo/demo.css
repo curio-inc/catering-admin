@@ -1128,6 +1128,40 @@
   color: var(--muted);
 }
 
+.demo-customer-info {
+  margin: 0;
+  display: grid;
+  gap: 0.65rem 1.25rem;
+}
+
+.demo-customer-info-row {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0.5rem 1rem;
+  align-items: baseline;
+}
+
+.demo-customer-info-row dt {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.demo-customer-info-row dd {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+@media (max-width: 480px) {
+  .demo-customer-info-row {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+}
+
 @media (max-width: 768px) {
   .demo-calendar-cell {
     min-height: 4rem;
