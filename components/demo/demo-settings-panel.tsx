@@ -214,17 +214,18 @@ export function DemoSettingsPanel({ onSaved }: DemoSettingsPanelProps) {
               return <div key={`pad-${i}`} className="rss-calendar-cell rss-calendar-cell--pad" role="gridcell" />
             }
 
-            const status = getReceptionStopDateStatus(cell.dateKey, entries)
-            const dow = getDayOfWeek(cell.dateKey)
+            const dateKey = cell.dateKey
+            const status = getReceptionStopDateStatus(dateKey, entries)
+            const dow = getDayOfWeek(dateKey)
             return (
               <button
-                key={cell.dateKey}
+                key={dateKey}
                 type="button"
                 className={`rss-calendar-cell rss-calendar-cell--clickable rss-calendar-cell--${status}${dow === 0 ? " rss-calendar-cell--sun" : ""}${dow === 6 ? " rss-calendar-cell--sat" : ""}`}
                 role="gridcell"
                 aria-pressed={status === "all-day"}
                 aria-label={`${month}月${cell.day}日${status === "all-day" ? " 終日停止中" : status === "partial" ? " 時間帯停止あり" : ""}`}
-                onClick={() => handleToggleAllDay(cell.dateKey)}
+                onClick={() => handleToggleAllDay(dateKey)}
               >
                 <span className="rss-calendar-day-num">{cell.day}</span>
               </button>
